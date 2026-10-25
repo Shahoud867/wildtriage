@@ -1,0 +1,32 @@
+# Exp 1: review-budgeted, risk-controlled triage with site adaptation (docs/PROJECT_PLAN.md §3, §9).
+data:
+  source: lila
+  datasets: [snapshot_serengeti, caltech_camera_traps, idaho_camera_traps, nacti, orinoquia]  # pick >= 3 in W1
+  md_results: md1000-redwood_results_raw   # LILA precomputed MegaDetector results
+  md_min_conf: 0.2
+  box_expand: 0.5                          # StreamTrap enlarges boxes by 50%
+  site_filter: {min_months: 6, min_animal_images: 1000, min_species: 3}
+  n_dev_sites: 10
+  n_test_sites: 20
+  interval: month
+embeddings:
+  model: bioclip-2
+  prompt_template: "a photo of {label}."
+  dtype: auto                              # bf16 on the lab PC, fp16 on the T1000
+simulation:
+  budgets: [0.01, 0.05, 0.10, 0.25]        # share of each interval sent to human review
+  alphas: [0.02, 0.05, 0.10]               # target error among auto-accepted
+  selection: [random, least_confidence, margin, entropy, kcenter, balanced_uncertainty]
+  # Baselines from the related work (docs/PROJECT_PLAN.md §3.3): StreamTrap's adapt-or-skip rule (adapt when the
+  # mean max-softmax probability falls below a threshold set from zero-shot BioCLIP 2 statistics), and
+  # Huebner et al.-style fixed confidence routing (raw softmax threshold, no guarantee).
+  baselines: [streamtrap_msp_adapt_or_skip, fixed_threshold_routing]
+  sequence_aggregation: [logit_mean, prob_mean, max]   # logit_mean is the default (Dussert et al. 2025)
+  acceptance: [threshold_raw, split_conformal_ltt, crc, aci]
+  mondrian_groups: [day_night]             # ablation: on/off
+  update: [none, linear_head, linear_head_bsm, linear_head_bsm_wise]   # LoRA ablation in W5 (lab PC)
+  wise_alpha: 0.5
+  audit_rate: 0.02
+  reviewer_noise: [0.0, 0.02]
+  seeds: [0, 1, 2]
+metrics: [per_class_accuracy, macro_f1, ece, adaptive_ece, coverage, accepted_error, alpha_violation_rate, aurc, labels_used]
