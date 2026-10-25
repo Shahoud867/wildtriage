@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+/* Design tokens. Confidence colours are always paired with an icon and text (colour-blind safe). */
+@theme {
+  --color-brand: #2f6f4f;
+  --color-conf-high: #1f7a4d;
+  --color-conf-med: #a86b00;
+  --color-conf-low: #b3261e;
+}
+
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  @apply bg-stone-50 text-stone-900 dark:bg-stone-950 dark:text-stone-100;
+}
