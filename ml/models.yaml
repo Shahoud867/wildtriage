@@ -1,0 +1,62 @@
+# Model and dataset manifest. scripts/license_check.py refuses non-commercial entries when WT_COMMERCIAL_MODE=true.
+# "verified" = checked against the linked source on 2026-10-18; "verify" = still open (see docs/PROJECT_PLAN.md).
+# runs_on: lab = RTX 4000 Ada 20 GB (queue gpu-heavy + gpu); t1000 = Quadro T1000 4 GB (queue gpu); cpu = any machine.
+models:
+  - name: megadetector
+    versions: [MDV5A, MDV1000-redwood]
+    task: detect
+    source: https://github.com/agentmorris/MegaDetector
+    license: MIT repository; weight terms and YOLOv5 (AGPL-3.0) dependency need checking
+    commercial_ok: verify
+    runs_on: [lab, t1000]
+  - name: bioclip-2
+    task: classify
+    source: https://huggingface.co/imageomics/bioclip-2
+    license: MIT (model card, verified)
+    commercial_ok: true
+    runs_on: [lab, t1000]
+  - name: speciesnet
+    task: classify
+    source: https://github.com/google/cameratrapai
+    license: Apache-2.0 repository (verified); weight terms verify
+    commercial_ok: verify
+    runs_on: [lab, t1000]
+  - name: sam3
+    versions: [facebook/sam3, facebook/sam3.1]
+    task: segment_track
+    source: https://github.com/facebookresearch/sam3
+    license: SAM License (verified; royalty-free, trade-control and acceptable-use limits; legal review before sale)
+    commercial_ok: verify
+    runs_on: [lab]
+  - name: depthsam
+    task: camouflage
+    source: https://github.com/hjy0518/DepthSAM
+    license: Apache-2.0 code (verified) + Depth-Anything-V2-Large CC-BY-NC-4.0 (verified)
+    commercial_ok: false
+    runs_on: [lab]
+  - name: owl
+    task: aerial_count
+    source: https://github.com/microsoft/MegaDetector-Overhead
+    license: MIT code; CC BY-NC-SA 4.0 weights and data (verified)
+    commercial_ok: false
+    runs_on: [lab, t1000]  # OWL-C is light; OWL-D (3.5 GB checkpoint) lab only
+  - name: qwen3-vl
+    task: vlm
+    source: https://github.com/QwenLM/Qwen3-VL
+    license: Apache-2.0 (verified)
+    commercial_ok: true
+    runs_on: [lab]
+
+datasets:
+  - name: sa-fari
+    source: https://huggingface.co/datasets/facebook/SA-FARI
+    license: CC-BY-NC-4.0 (verified)
+    commercial_ok: false
+  - name: lila-camera-traps
+    source: https://lila.science/datasets
+    license: per dataset (record each one used)
+    commercial_ok: verify
+  - name: cod10k-camo-nc4k-chameleon
+    source: links in the DepthSAM README
+    license: research use (verify)
+    commercial_ok: false

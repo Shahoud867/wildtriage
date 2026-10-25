@@ -1,0 +1,22 @@
+[project]
+name = "wildtriage-ml"
+version = "0.1.0"
+description = "WildTriage model adapters, pipeline utilities, triage policy and site adaptation"
+requires-python = ">=3.12"
+dependencies = ["numpy>=1.26", "pyyaml>=6"]
+
+[project.optional-dependencies]
+# Install on the GPU machine only. Install torch first from the CUDA index, e.g.
+#   uv pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+gpu = ["torch>=2.7", "torchvision", "open_clip_torch>=2.24", "pillow>=10", "megadetector", "peft>=0.11"]
+dev = ["pytest>=8", "pytest-cov>=5", "huggingface_hub>=1.29"]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["wildtriage_ml*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
