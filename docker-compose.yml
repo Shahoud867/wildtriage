@@ -1,0 +1,72 @@
+# Laptop (stub models):       docker compose --profile stub up --build     -> http://localhost:8080
+# Machine with an NVIDIA GPU: docker compose --profile gpu up --build      (set WT_MODEL_BACKEND=real in .env)
+# The managed lab PC may not allow Docker; see scripts/native/ for the no-admin Windows path.
+name: wildtriage
+
+x-backend-env: &backend-env
+  WT_DATABASE_URL: postgresql+psycopg://wildtriage:${POSTGRES_PASSWORD:-wildtriage}@db:5432/wildtriage
+  WT_MEDIA_ROOT: /data/media
+  WT_SECRET_KEY: ${WT_SECRET_KEY:-change-me}
+  WT_ENV: ${WT_ENV:-dev}
+  WT_MODEL_BACKEND: ${WT_MODEL_BACKEND:-stub}
+  WT_COMMERCIAL_MODE: ${WT_COMMERCIAL_MODE:-false}
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: wildtriage
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wildtriage}
+      POSTGRES_DB: wildtriage
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wildtriage"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: { context: ., dockerfile: docker/api.Dockerfile }
+    environment: *backend-env
+    volumes: [media:/data/media]
+    ports: ["8000:8000"]
+    depends_on: { db: { condition: service_healthy } }
+
+  worker-cpu:
+    build: { context: ., dockerfile: docker/api.Dockerfile }
+    command: ["python", "-m", "app.workers.runner", "--queues", "cpu"]
+    environment: *backend-env
+    volumes: [media:/data/media]
+    depends_on: [api]
+
+  # Stub models: lets the full pipeline run on a laptop without CUDA.
+  worker-stub-gpu:
+    build: { context: ., dockerfile: docker/api.Dockerfile }
+    command: ["python", "-m", "app.workers.runner", "--queues", "gpu,gpu-heavy"]
+    environment: *backend-env
+    volumes: [media:/data/media]
+    depends_on: [api]
+    profiles: ["stub"]
+
+  worker-gpu:
+    build: { context: ., dockerfile: docker/worker-gpu.Dockerfile }
+    environment:
+      <<: *backend-env
+      WT_GPU_VRAM_BUDGET_GB: ${WT_GPU_VRAM_BUDGET_GB:-18}
+      HF_TOKEN: ${HF_TOKEN:-}
+    volumes: [media:/data/media, hf-cache:/root/.cache/huggingface]
+    depends_on: [api]
+    profiles: ["gpu"]
+    deploy:
+      resources:
+        reservations:
+          devices: [{ driver: nvidia, count: 1, capabilities: [gpu] }]
+
+  frontend:
+    build: { context: ., dockerfile: docker/frontend.Dockerfile }
+    ports: ["8080:80"]
+    depends_on: [api]
+
+volumes:
+  pgdata:
+  media:
+  hf-cache:

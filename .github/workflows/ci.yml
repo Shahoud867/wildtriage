@@ -1,0 +1,45 @@
+name: ci
+on:
+  push:
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Install (CPU only, stub models)
+        run: |
+          uv venv --python 3.12
+          uv pip install -e "ml[dev]" -e "backend[dev]" pillow pandas
+      - name: ML unit tests
+        run: cd ml && ../.venv/bin/python -m pytest -q
+      - name: Backend tests (SQLite, stub models)
+        run: cd backend && ../.venv/bin/python -m pytest -q --cov=app --cov-report=term-missing
+      - name: Research smoke tests
+        run: cd research && ../.venv/bin/python -m pytest -q
+      - name: Native script tests (Windows/macOS/Linux parity, bash syntax)
+        run: .venv/bin/python -m pytest -q scripts/tests
+      - name: ShellCheck
+        run: |
+          command -v shellcheck >/dev/null || (sudo apt-get update && sudo apt-get install -y shellcheck)
+          shellcheck scripts/native/*.sh
+      - name: License report
+        run: .venv/bin/python scripts/license_check.py
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+      - run: npm test
