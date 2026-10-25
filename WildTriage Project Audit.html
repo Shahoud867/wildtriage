@@ -1,0 +1,1475 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>WildTriage Project Audit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: field-notebook document. Sticky contents rail on wide screens, a trail-camera
+   data strip as the masthead, chips for the plan's evidence labels. */
+:root {
+  --bg: #f4f6f3;          /* lichen-tinted paper */
+  --surface: #ffffff;
+  --ink: #18221d;
+  --muted: #5a6760;
+  --rule: #d5ddd7;
+  --accent: #1f5f4b;      /* canopy green */
+  --accent-ink: #ffffff;
+  --strip: #101714;       /* camera-trap info bar */
+  --strip-ink: #e8efe9;
+  --ir: #c9821f;          /* IR-flash amber */
+  --code-bg: #e9eee9;
+  --chip-v: #1f6b45; --chip-r: #2b5c8a; --chip-a: #9a6200; --chip-u: #a3352e;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1512; --surface: #151d19; --ink: #e3eae5; --muted: #9aa9a0; --rule: #2a3530;
+    --accent: #6fbf9c; --accent-ink: #0f1512; --strip: #060a08; --strip-ink: #d9e4dc; --ir: #e2a24a;
+    --code-bg: #1b2520; --chip-v: #6cc895; --chip-r: #7fb2e5; --chip-a: #e3a948; --chip-u: #f08a80;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1512; --surface: #151d19; --ink: #e3eae5; --muted: #9aa9a0; --rule: #2a3530;
+  --accent: #6fbf9c; --accent-ink: #0f1512; --strip: #060a08; --strip-ink: #d9e4dc; --ir: #e2a24a;
+  --code-bg: #1b2520; --chip-v: #6cc895; --chip-r: #7fb2e5; --chip-a: #e3a948; --chip-u: #f08a80;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 15.5px/1.6 var(--font-body); }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--ir); outline-offset: 2px; border-radius: 2px; }
+
+.strip { background: var(--strip); color: var(--strip-ink); font: 500 12px/1 var(--font-mono);
+  letter-spacing: .08em; text-transform: uppercase;
+  padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.strip-inner { max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 6px 22px; }
+.strip .ir { color: var(--ir); }
+header.mast { padding-block: 40px 28px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--rule); }
+.mast-inner { max-width: 1240px; margin: 0 auto; display: grid; gap: 12px; }
+.mast h1 { font: 800 clamp(30px, 5vw, 50px)/1.04 var(--font-display); font-stretch: 112%; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+.mast p { margin: 0; max-width: 68ch; color: var(--muted); font-size: 17px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px;
+  padding-block: 32px 80px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; max-height: calc(100vh - 32px); overflow: auto; }
+nav.toc h2 { font: 700 12px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+nav.toc a { display: block; padding: 5px 10px; border-left: 2px solid var(--rule); color: var(--ink); text-decoration: none; font-size: 13.5px; line-height: 1.35; }
+nav.toc a:hover { border-left-color: var(--accent); color: var(--accent); }
+details.toc-mobile { display: none; }
+
+article { min-width: 0; }
+article > :first-child { margin-top: 0; }
+article h2 { font: 750 26px/1.15 var(--font-display); font-stretch: 108%; margin: 56px 0 14px; padding-top: 18px; border-top: 2px solid var(--ink); text-wrap: balance; scroll-margin-top: 16px; }
+article h3 { font: 700 18.5px/1.25 var(--font-display); margin: 30px 0 10px; text-wrap: balance; }
+article p, article li { max-width: 76ch; }
+article ul, article ol { padding-left: 1.3em; }
+article li { margin: 3px 0; }
+article hr { display: none; }
+strong { font-weight: 600; }
+code { font: 500 0.88em/1.4 var(--font-mono); background: var(--code-bg); padding: 1px 5px; border-radius: 3px; overflow-wrap: anywhere; }
+.scroll { overflow-x: auto; margin: 16px 0 22px; max-width: 100%; }
+pre { margin: 0; background: var(--code-bg); padding: 14px 16px; border-radius: 4px; font: 400 12.5px/1.45 var(--font-mono); }
+pre code { background: none; padding: 0; font: inherit; overflow-wrap: normal; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; background: var(--surface); font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--rule); min-width: 120px; }
+th { font: 600 12px/1.3 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); border-bottom: 2px solid var(--ink); background: var(--bg); }
+td:first-child { font-weight: 500; }
+tr:hover td { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+
+.chip { display: inline-block; font: 600 10.5px/1 var(--font-mono); padding: 3px 5px 2px; border-radius: 3px;
+  border: 1px solid currentColor; vertical-align: 2px; margin: 0 1px; }
+.chip-verified { color: var(--chip-v); } .chip-rec { color: var(--chip-r); }
+.chip-assume { color: var(--chip-a); } .chip-open { color: var(--chip-u); }
+li.todo { list-style: none; margin-left: -1.3em; display: flex; gap: 10px; align-items: baseline; }
+li.todo .box { flex: none; width: 13px; height: 13px; border: 1.5px solid var(--muted); border-radius: 2px; transform: translateY(2px); }
+
+footer { border-top: 1px solid var(--rule); color: var(--muted); font-size: 13px;
+  padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+footer div { max-width: 1240px; margin: 0 auto; }
+
+@media (max-width: 980px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  nav.toc { display: none; }
+  details.toc-mobile { display: block; border: 1px solid var(--rule); border-radius: 4px; background: var(--surface); padding: 10px 14px; }
+  details.toc-mobile summary { cursor: pointer; font: 600 13px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .08em; }
+  details.toc-mobile ol { margin: 10px 0 0; padding-left: 1.2em; }
+  article h2 { font-size: 22px; margin-top: 40px; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="strip" role="presentation">
+  <div class="strip-inner">
+    <span>AUDIT 2026-10-24</span><span>End of week 1 of 8</span><span>Verdict · partially on track</span><span>76 tests passing</span><span class="ir">0 real models run yet</span><span>Zero-cost · publication excepted</span>
+  </div>
+</div>
+<header class="mast">
+  <div class="mast-inner">
+    <h1>WildTriage Project Audit and Revised Master Plan</h1>
+    <p>An evidence-based audit of the WildTriage project at the end of Week 1, with a revised master plan for the remaining seven weeks and beyond.</p>
+    <div class="legend" aria-label="Evidence labels">
+      <span><span class="chip chip-verified">V</span> verified against the linked source</span>
+      <span><span class="chip chip-rec">R</span> recommendation</span>
+      <span><span class="chip chip-assume">A</span> assumption to check</span>
+      <span><span class="chip chip-open">U</span> unresolved</span>
+    </div>
+  </div>
+</header>
+<div class="wrap">
+  <nav class="toc" aria-label="Contents"><h2>Contents</h2><ol><li><a href="#0-evidence-base-and-missing-information">0. Evidence base and missing information</a></li>
+<li><a href="#1-executive-verdict">1. Executive verdict</a></li>
+<li><a href="#2-original-requirements-audit">2. Original requirements audit</a></li>
+<li><a href="#3-research-and-publication-assessment">3. Research and publication assessment</a></li>
+<li><a href="#4-product-and-interface-assessment">4. Product and interface assessment</a></li>
+<li><a href="#5-hardware-and-cost-audit">5. Hardware and cost audit</a></li>
+<li><a href="#6-portfolio-and-commercial-assessment">6. Portfolio and commercial assessment</a></li>
+<li><a href="#7-risk-register">7. Risk register</a></li>
+<li><a href="#8-revised-implementation-roadmap">8. Revised implementation roadmap</a></li>
+<li><a href="#9-recommended-changes-to-the-existing-plan">9. Recommended changes to the existing plan</a></li>
+<li><a href="#10-final-recommendation">10. Final recommendation</a></li></ol></nav>
+  <article>
+    <details class="toc-mobile"><summary>Contents</summary><ol><li><a href="#0-evidence-base-and-missing-information">0. Evidence base and missing information</a></li>
+<li><a href="#1-executive-verdict">1. Executive verdict</a></li>
+<li><a href="#2-original-requirements-audit">2. Original requirements audit</a></li>
+<li><a href="#3-research-and-publication-assessment">3. Research and publication assessment</a></li>
+<li><a href="#4-product-and-interface-assessment">4. Product and interface assessment</a></li>
+<li><a href="#5-hardware-and-cost-audit">5. Hardware and cost audit</a></li>
+<li><a href="#6-portfolio-and-commercial-assessment">6. Portfolio and commercial assessment</a></li>
+<li><a href="#7-risk-register">7. Risk register</a></li>
+<li><a href="#8-revised-implementation-roadmap">8. Revised implementation roadmap</a></li>
+<li><a href="#9-recommended-changes-to-the-existing-plan">9. Recommended changes to the existing plan</a></li>
+<li><a href="#10-final-recommendation">10. Final recommendation</a></li></ol></details>
+    <p><strong>Audit date:</strong> Saturday 24 October 2026. This is the end of Week 1 of the 8-week plan (19 Oct – 13 Dec 2026).</p>
+<p><strong>Scope.</strong> Everything in this conversation since 18 October:
+- the original brief;
+- the paper validation;
+- <a href="PROJECT_PLAN.md"><code>PROJECT_PLAN.md</code></a>;
+- the code in <code>wildtriage/</code>;
+- the published plan page and prototype page;
+- the related-work search;
+- the hardware and cost decisions.</p>
+<p><strong>Labels:</strong>
+- <strong class="chipwrap"><span class="chip chip-verified" title="Verified">V</span></strong> verified on the linked source, or by running something, on the date given.
+- <strong class="chipwrap"><span class="chip chip-rec" title="Recommendation">R</span></strong> my judgment from the evidence.
+- <strong class="chipwrap"><span class="chip chip-assume" title="Assumption">A</span></strong> an assumption.
+- <strong class="chipwrap"><span class="chip chip-open" title="Unresolved">U</span></strong> unresolved.</p>
+<hr />
+<h2 id="0-evidence-base-and-missing-information">0. Evidence base and missing information</h2>
+<p><strong>What I checked for this audit</strong> (24 Oct 2026):</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Test suites</td>
+<td>All pass. <span class="chip chip-verified" title="Verified">V</span> ML package 32, backend 13, research simulator 3; frontend build and 3 unit tests passed on 18 Oct.</td>
+</tr>
+<tr>
+<td>Code size</td>
+<td>About 5,900 lines of Python, TypeScript, PowerShell and YAML. <span class="chip chip-verified" title="Verified">V</span></td>
+</tr>
+<tr>
+<td>Stubs</td>
+<td>10 <code>NotImplementedError</code> stubs in 6 files: SAM 3, DepthSAM/OWL, LoRA, Exp 2–4. <span class="chip chip-verified" title="Verified">V</span></td>
+</tr>
+<tr>
+<td>Activity since 18 Oct</td>
+<td>Nothing changed in the repo except my own edits. <span class="chip chip-verified" title="Verified">V</span></td>
+</tr>
+<tr>
+<td>Repository</td>
+<td>Still inside OneDrive. No git repository. No <code>research/manifests/</code>. No dataset cards beyond the template. <span class="chip chip-verified" title="Verified">V</span></td>
+</tr>
+<tr>
+<td>Follow-up session</td>
+<td>The proposed StreamTrap-mini data-prep session was never started. <span class="chip chip-verified" title="Verified">V</span></td>
+</tr>
+<tr>
+<td>SA-FARI bucket</td>
+<td>Anonymously readable: listing <code>sa_fari/</code> returned <code>sa_fari_test/</code>, <code>sa_fari_train/</code> and tar folders with no billing project. <span class="chip chip-verified" title="Verified">V</span></td>
+</tr>
+<tr>
+<td>LILA bucket</td>
+<td><code>public-datasets-lila</code> is anonymously readable too. <span class="chip chip-verified" title="Verified">V</span></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Missing information that changes the conclusions</strong> <span class="chip chip-open" title="Unresolved">U</span>. I have not invented answers to any of these.</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Question</th>
+<th>Why it matters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Have SAM 3 and SA-FARI Hugging Face access been <strong>requested</strong>, and granted?</td>
+<td>It is on the critical path for Paper 1. Approval time is unknown.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>What did lab IT say about admin rights, Docker, overnight runs and disk persistence?</td>
+<td>It decides whether the lab PC can carry the heavy work.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Has the instructor approved the <strong>Paper 3 swap</strong>, and is ECCV on the approved list?</td>
+<td>A rejection forces a fallback to Real-Wild-VLM.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>What is the <strong>grading rubric</strong>, and the exact final deadline and deliverables (report, demo, code, viva)?</td>
+<td>It decides what to optimise. The plan currently guesses.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Does the MacBook <strong>replace</strong> the Quadro T1000 machine, or <strong>add to</strong> it? Is the team still 2 people?</td>
+<td>It changes the machine roles (§5). <strong>Partly answered 24 Oct:</strong> the lab PC stays available, with molab when needed. Whether the T1000 is still available is open.</td>
+</tr>
+<tr>
+<td>6</td>
+<td>How many hours per week can each member really give?</td>
+<td>It decides how much of the roadmap is feasible (§8).</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Does the course allow <strong>AI-assisted code</strong>, and does it require disclosure?</td>
+<td>A large share of the current code was written by Claude in this session.</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Is there <strong>department funding</strong> for conference registration or journal fees?</td>
+<td>It decides whether the publication goal can stay zero-cost (§5).</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="1-executive-verdict">1. Executive verdict</h2>
+<p><strong>Partially on track: ahead on planning and the platform, behind on research and models.</strong> <span class="chip chip-rec" title="Recommendation">R</span></p>
+<p><strong>On track:</strong>
+- The planning is thorough and source-checked.
+- The platform skeleton works end to end with stand-in models: upload, job queue, triage, review, audit and analytics, all tested.
+- The research direction is sensible and has been cut back to an honest claim.
+- The roadmap's Week 1–2 work for the platform member is largely done already.</p>
+<p><strong>Off track:</strong>
+- <strong>No real model, image or dataset has been touched</strong>, a week into an eight-week plan. Every Week 1 acceptance item on the research side is open: model smoke tests, SAM 3 on three clips, LILA site selection, the protocol two-pager.
+- Week 1's unblocking actions have no evidence of being done: access requests, the IT check, instructor approval, moving the repo and creating git.
+- The research hypothesis has only been checked on synthetic data, and there it gave <strong>no advantage for our selection strategy over plain least-confidence review</strong> (both final-label accuracy 0.953 vs 0.955 in the smoke run). That is a warning sign, not a result. It argues for reframing the research question (§3).
+- <strong>Paper 2 (DepthSAM) is planned only as P1</strong> and sits second on the scope-cut ladder. For a course that requires three papers, that is an inconsistency: Paper 2 could vanish from the final deliverable.
+- <strong>Publishing at a reputable venue is not free.</strong> CVPR requires a paid author registration for every accepted paper, including workshop papers. The relevant ecology journals are open access with fees (§5). This conflicts with the zero-cost requirement unless someone else pays or a waiver applies.
+- <strong>Commercial value is modest.</strong> Free tools already cover most of the market (§6).</p>
+<p><strong>Realistic outcome by 13 Dec</strong> <span class="chip chip-rec" title="Recommendation">R</span>, if Weeks 2–4 go to the critical path:
+- a strong course project;
+- a strong portfolio piece;
+- an experiment design close to publishable.</p>
+<p><strong>Not realistic by 13 Dec:</strong>
+- a publication-ready submission (the CVPR 2027 deadline is 16 Nov 2026 <span class="chip chip-verified" title="Verified">V</span>);
+- a sellable product.</p>
+<p>A credible workshop or journal submission is realistic in <strong>Feb–Mar 2027</strong>, with 6–10 more weeks of research work after the course.</p>
+<hr />
+<h2 id="2-original-requirements-audit">2. Original requirements audit</h2>
+<p><strong>Status key:</strong>
+- <strong>Done:</strong> done and tested or verified.
+- <strong>Partial:</strong> some of it exists.
+- <strong>Planned:</strong> designed only.
+- <strong>Unverified:</strong> written but never run.
+- <strong>Missing:</strong> not addressed.</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Requirement (from the original brief unless noted)</th>
+<th>Status</th>
+<th>Evidence</th>
+<th>What remains</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Process camera-trap and aerial data to <strong>detect</strong> animals</td>
+<td>Unverified</td>
+<td>MegaDetector adapter written; never run</td>
+<td>Run it on real images (W2)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Classify</strong> species</td>
+<td>Unverified</td>
+<td>BioCLIP 2 adapter + calibration + per-site heads written; heads tested on synthetic data</td>
+<td>Real embeddings, real accuracy (W2–W3)</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Segment</strong></td>
+<td>Missing in code</td>
+<td>SAM 3 adapter is a stub; DepthSAM a stub</td>
+<td>SAM 3 video masks (W3); DepthSAM reproduction (W3–W4)</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Track</strong> in video</td>
+<td>Missing in code</td>
+<td>MaxN counting is tested; the tracker is a stub</td>
+<td>SAM 3 tracking; ByteTrack baseline (W3)</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Population estimation</strong></td>
+<td>Descoped, with reason</td>
+<td>Plan §1: no camera geometry or movement data, so we report activity indices (events, RAI, MaxN). Counting code is tested.</td>
+<td>Keep the descope; say so clearly in the report</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Robust to lighting, motion blur, camouflage, diverse environments</td>
+<td>Partial</td>
+<td>Night/IR flag, blur and brightness checks tested; day/night groups in the policy; camouflage via DepthSAM (P1)</td>
+<td>Real robustness evaluation; make DepthSAM minimal P0 (§9)</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>Aerial</strong> imagery where feasible</td>
+<td>Planned (P1)</td>
+<td>Resources verified; no code</td>
+<td>Recommend P2: none of the 3 papers is aerial and the team is small (§9)</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Cohesive product: backend, persistent DB, frontend, evaluation, novelty</td>
+<td>Partial</td>
+<td>FastAPI + SQLAlchemy + Alembic + Postgres queue, React UI, 48 tests</td>
+<td>Real models; Postgres never actually run; UI incomplete</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Validate papers: details, code, licences, compute, reproducibility</td>
+<td>Done, with depth caveats</td>
+<td>Plan §2, §2.5</td>
+<td>The PDFs of DepthSAM and Real-Wild-VLM were never read</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Direct vs indirect relevance; integration; gaps; keep or replace papers</td>
+<td>Done</td>
+<td>Plan §2.2–2.4; swap to ECCV</td>
+<td>Instructor approval <span class="chip chip-open" title="Unresolved">U</span></td>
+</tr>
+<tr>
+<td>11</td>
+<td>Product definition: users, inputs, schemas, capabilities, scope</td>
+<td>Done (on paper)</td>
+<td>Plan §4</td>
+<td>Not validated with any real user</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Defensible research novelty with experiment design</td>
+<td>Partial</td>
+<td>Plan §3; related-work search; simulator</td>
+<td>Novelty unproven; no real experiment run</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Architecture: ML, data, backend, DB, frontend, ops, scale</td>
+<td>Done (design); partly built</td>
+<td>Plan §5–6, 11; ADR 0001</td>
+<td>Postgres, Docker and the native scripts never run</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Reuse existing work (repos, weights, data)</td>
+<td>Planned</td>
+<td>Commands and licences listed</td>
+<td>Nothing downloaded or run</td>
+</tr>
+<tr>
+<td>15</td>
+<td>8-week roadmap with P0/P1/P2, owners, risks</td>
+<td>Done, now needs revision</td>
+<td>Plan §8</td>
+<td>Revised in §8 below</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Evaluation framework and testing strategy</td>
+<td>Partial</td>
+<td>Metrics defined; unit, API, migration and E2E-stub tests exist</td>
+<td>No real metric computed; no Playwright E2E</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Commercial and research readiness</td>
+<td>Partial</td>
+<td>Competitor table verified 18 Oct; licence manifest</td>
+<td>No user interviews</td>
+</tr>
+<tr>
+<td>18</td>
+<td>Deliverables 1–13 in order</td>
+<td>Done</td>
+<td><code>PROJECT_PLAN.md</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>19</td>
+<td>Evidence-based, cited, labelled (working principles)</td>
+<td>Mostly done</td>
+<td><span class="chip chip-verified" title="Verified">V</span>/<span class="chip chip-rec" title="Recommendation">R</span>/<span class="chip chip-assume" title="Assumption">A</span>/<span class="chip chip-open" title="Unresolved">U</span> labels; links</td>
+<td>Some claims rest on search summaries, not primary sources (plan §2.5)</td>
+</tr>
+<tr>
+<td>20</td>
+<td>Polished, interactive interface (original brief + later requests)</td>
+<td>Partial</td>
+<td>Real UI: login, projects, upload, jobs, media, review with hotkeys, analytics, models. Clickable mock-up of the target.</td>
+<td>Video viewer, charts, comparisons, exports, settings, mobile layout, E2E tests</td>
+</tr>
+<tr>
+<td>21</td>
+<td><strong>Zero monetary cost</strong> (later requirement)</td>
+<td>Mostly met for development; <strong>not met for publication</strong></td>
+<td>§5</td>
+<td>Funding or waiver for registration or journal fees, or a preprint-only path</td>
+</tr>
+<tr>
+<td>22</td>
+<td>Use the team's actual hardware (later requirement)</td>
+<td>Partial</td>
+<td>3 machines planned; per-machine VRAM budgets coded</td>
+<td>Apple Silicon support missing in code (§5)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Decisions to revisit, rather than assume correct</strong> <span class="chip chip-rec" title="Recommendation">R</span>:</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Decision</th>
+<th>Verdict</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Swap Paper 3 to StreamTrap (ECCV)</td>
+<td><strong>Keep</strong></td>
+<td>Main conference, directly relevant, public data. It has no released code, so we rebuild its protocol. The instructor may expect a reproduction of released code, so ask.</td>
+</tr>
+<tr>
+<td>Postgres job queue instead of Celery + Redis</td>
+<td><strong>Keep</strong></td>
+<td>Simpler, works on Windows, tested.</td>
+</tr>
+<tr>
+<td>BioCLIP 2 as the main classifier</td>
+<td><strong>Keep for research</strong>; add SpeciesNet as a product option (P1)</td>
+<td>BioCLIP 2 is needed for zero-shot plus adaptation. SpeciesNet with geofencing is probably the better product default on non-LILA data <span class="chip chip-assume" title="Assumption">A</span>, but it leaks on LILA.</td>
+</tr>
+<tr>
+<td>SAM 3 for video</td>
+<td><strong>Keep</strong>, but only on the lab PC or molab</td>
+<td>It is Paper 1's model. Mac support is an unmerged pull request (§5).</td>
+</tr>
+<tr>
+<td>Building the platform before touching data</td>
+<td><strong>Was a mistake of emphasis</strong> <span class="chip chip-rec" title="Recommendation">R</span></td>
+<td>The platform is now 2–3 weeks ahead of the research, which is the graded and riskier part. Rebalance immediately.</td>
+</tr>
+<tr>
+<td>DepthSAM as P1</td>
+<td><strong>Change to minimal P0</strong></td>
+<td>Course coverage of all three papers.</td>
+</tr>
+<tr>
+<td>Aerial as P1</td>
+<td><strong>Change to P2</strong></td>
+<td>Scope.</td>
+</tr>
+<tr>
+<td>Prototype and marketing pages</td>
+<td><strong>Stop here</strong></td>
+<td>They did their job: they communicate the vision. More polish adds no grade or research value.</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="3-research-and-publication-assessment">3. Research and publication assessment</h2>
+<h3 id="31-where-it-stands">3.1 Where it stands</h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Where WildTriage is</th>
+<th>What gets it to the next level</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Course-level implementation</td>
+<td><strong>Reachable by 13 Dec</strong> if Weeks 2–5 run the three papers' models on real data</td>
+<td>Real models, SA-FARI subset reproduction, DepthSAM reproduction, Exp 1 on real sites</td>
+</tr>
+<tr>
+<td>Strong portfolio project</td>
+<td><strong>Reachable by 13 Dec</strong></td>
+<td>The above, plus a public repo, a demo video, a clean write-up, and evidence each member wrote substantial parts</td>
+</tr>
+<tr>
+<td>Potentially publishable contribution</td>
+<td><strong>Not yet.</strong> A design and a synthetic simulator only.</td>
+<td>Real multi-site results that show something non-obvious, with baselines and confidence intervals</td>
+</tr>
+<tr>
+<td>Publication-ready submission</td>
+<td><strong>Not before Feb–Mar 2027</strong></td>
+<td>A larger evaluation, a clear contribution, related work done properly, a paper draft reviewed by a supervisor</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="32-main-weaknesses-r">3.2 Main weaknesses <span class="chip chip-rec" title="Recommendation">R</span></h3>
+<ol>
+<li><strong>No empirical evidence yet.</strong> The only results are synthetic, and there our strategy did not beat least-confidence review.</li>
+<li><strong>Contribution risk.</strong> Every component is existing work (plan §3.3). A combination study is publishable only if it reveals something reviewers didn't know. Examples: how often error guarantees fail across real camera sites, or how a review budget should be split between certifying and learning.</li>
+<li><strong>Scale.</strong> About 30 sites is small next to StreamTrap's 546. Reviewers will ask why.</li>
+<li><strong>Human factor.</strong> A "mini-study" with 2–4 reviewers is too weak for claims about review time. Use a simulated reviewer cost, and present the human study as a sanity check only.</li>
+<li><strong>Literature check.</strong> About 10 searches is not a literature review.</li>
+</ol>
+<h3 id="33-recommended-research-reframing-r">3.3 Recommended research reframing <span class="chip chip-rec" title="Recommendation">R</span></h3>
+<p>Lead with the question the simulator already pointed at, which is less crowded than "our selection beats theirs":</p>
+<blockquote>
+<p><strong>RQ*: Under temporal shift at real camera sites, how should a fixed human-review budget be split between <em>certifying</em> automatic acceptance (random labels for a statistical guarantee) and <em>learning</em> (selected labels for site adaptation), and how often do the guarantees fail?</strong></p>
+</blockquote>
+<p><strong>Why this framing:</strong>
+- It turns the simulator's finding into the centre of the paper. Certifying a 5% error needs at least about 45 error-free calibration labels per group (plan §3.2).
+- It builds directly on StreamTrap's stated open problem: when to adapt.
+- Its deliverable is measurable: a curve of budget split against final-label accuracy and guarantee-violation rate, per site.
+- It holds up even if no selection strategy wins.</p>
+<p><strong>What the existing plan keeps:</strong> the baselines, metrics, the calibration fraction ablation and the guarantee-violation analysis. They become the core of the paper rather than ablations.</p>
+<h3 id="34-what-a-reviewer-will-want-r">3.4 What a reviewer will want <span class="chip chip-rec" title="Recommendation">R</span></h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Minimum for a workshop paper</th>
+<th>For a main-conference paper</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sites</td>
+<td>≥30 sites from ≥3 LILA datasets</td>
+<td>≥100 sites, or the full StreamTrap set once it is released</td>
+</tr>
+<tr>
+<td>Baselines</td>
+<td>Zero-shot; fixed-threshold routing (Huebner-style); least-confidence; StreamTrap mean-max-softmax adapt-or-skip; the all-labels oracle</td>
+<td>Plus active-learning baselines (Norouzzadeh-style) and conformal-set baselines (Fermanian et al.)</td>
+</tr>
+<tr>
+<td>Statistics</td>
+<td>3 seeds; bootstrap confidence intervals over sites; paired tests</td>
+<td>Plus a sensitivity analysis for every parameter you tuned</td>
+</tr>
+<tr>
+<td>Generality</td>
+<td>1 classifier (BioCLIP 2)</td>
+<td>≥2 backbones (BioCLIP 2 + SpeciesNet features)</td>
+</tr>
+<tr>
+<td>Reproducibility</td>
+<td>Code + manifests public</td>
+<td>Plus a released benchmark split</td>
+</tr>
+<tr>
+<td>Novelty</td>
+<td>Clear framing + negative results</td>
+<td>A method contribution: e.g. a budget-split rule with a guarantee, or a sequence-aware certification</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="35-venues-realistic-and-justified-r-dates-v-where-linked">3.5 Venues: realistic and justified [R, dates V where linked]</h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Venue</th>
+<th>Fit</th>
+<th>Timing</th>
+<th>Cost</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CVPR 2027 main conference</td>
+<td>Low (combination study)</td>
+<td>Deadline <strong>16 Nov 2026</strong> (<a href="https://cvpr.thecvf.com/Conferences/2027/CallForPapers" target="_blank" rel="noopener">CVPR CfP</a>)</td>
+<td>Paid author registration if accepted</td>
+<td><strong>No</strong>: three weeks away with no results</td>
+</tr>
+<tr>
+<td>ICCV 2027 main conference</td>
+<td>Low unless a method contribution emerges</td>
+<td>Deadline estimated ~8 Mar 2027 (third-party, not official)</td>
+<td>Paid registration</td>
+<td>Only if §3.4's right-hand column is met</td>
+</tr>
+<tr>
+<td>CVPR 2027 workshops (e.g. CV4Animals, which ran its 6th edition at CVPR 2026 (<a href="https://cvpr.thecvf.com/virtual/2026/workshop/36051" target="_blank" rel="noopener">listing</a>))</td>
+<td><strong>High</strong></td>
+<td>Workshop proposals due 4 Nov 2026 (<a href="https://cvpr.thecvf.com/Conferences/2027/CallForWorkshops" target="_blank" rel="noopener">call</a>); paper deadlines usually Feb–Mar <span class="chip chip-assume" title="Assumption">A</span></td>
+<td><strong>Paid AUTHOR registration required even for workshop papers</strong>; 2026 student in-person rates were $525–$810, and virtual registration does not cover a paper (<a href="https://cvpr.thecvf.com/Conferences/2026/Pricing2" target="_blank" rel="noopener">CVPR 2026 pricing</a>) <span class="chip chip-verified" title="Verified">V</span></td>
+<td><strong>Best academic target</strong>, but it costs money</td>
+</tr>
+<tr>
+<td>Camera traps, AI, and Ecology workshop</td>
+<td><strong>Very high</strong> (exact topic)</td>
+<td>Last edition found: 2023 (Jena) and 2024 (Hagenberg); no 2026–27 call found (<a href="https://inf-cv.uni-jena.de/camtrap-ws/" target="_blank" rel="noopener">site</a>)</td>
+<td>Fees not stated; hybrid</td>
+<td>Watch for a 2027 call</td>
+</tr>
+<tr>
+<td><em>Methods in Ecology and Evolution</em></td>
+<td>High (methods for ecologists)</td>
+<td>Rolling</td>
+<td>Gold open access; publication charge up to <strong>$3,500</strong> (<a href="https://www.doaj.org/toc/2041-210X" target="_blank" rel="noopener">DOAJ</a>) <span class="chip chip-verified" title="Verified">V</span></td>
+<td>Good fit; costs money unless waived</td>
+</tr>
+<tr>
+<td><em>Remote Sensing in Ecology and Conservation</em> (where Dussert et al. published)</td>
+<td>High</td>
+<td>Rolling</td>
+<td>Open access; publication charge up to <strong>$3,950</strong>, waiver policy (<a href="https://www.doaj.org/toc/2056-3485" target="_blank" rel="noopener">DOAJ</a>) <span class="chip chip-verified" title="Verified">V</span></td>
+<td>Good fit; ask about a waiver</td>
+</tr>
+<tr>
+<td><em>Ecological Informatics</em></td>
+<td>High</td>
+<td>Rolling</td>
+<td>Not checked <span class="chip chip-open" title="Unresolved">U</span></td>
+<td>Check whether a non-open-access, no-fee route exists</td>
+</tr>
+<tr>
+<td>arXiv preprint</td>
+<td>Not peer review</td>
+<td>Any time</td>
+<td><strong>Free</strong>; first-time authors need an endorsement from an established author (<a href="https://www.ccsd.cnrs.fr/?p=18532" target="_blank" rel="noopener">arXiv policy changes</a>) [V, partly]</td>
+<td><strong>Zero-cost path</strong>: ask a FAST faculty member with cs.CV papers to endorse</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Bottom line.</strong> The zero-cost route to "publication" is an arXiv preprint (Jan–Feb 2027), plus a workshop or journal submission only if registration or fees are covered. Ask the department in Week 2: many universities fund student conference registration. Submitting is free; presenting and publishing usually are not.</p>
+<hr />
+<h2 id="4-product-and-interface-assessment">4. Product and interface assessment</h2>
+<h3 id="41-architecture-and-code-quality-r-from-reading-the-code">4.1 Architecture and code quality [R, from reading the code]</h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Assessment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Architecture</td>
+<td>Appropriate for the team and the hardware: modular adapters, a VRAM-aware registry, capability-routed queues, append-only review records with an audit log. No unnecessary services. Keep it.</td>
+</tr>
+<tr>
+<td>Tests</td>
+<td>Good for a skeleton: 48 automated tests, 86% backend line coverage on 18 Oct. Missing: tests against Postgres, real-model "golden" tests, browser E2E.</td>
+</tr>
+<tr>
+<td>Performance</td>
+<td><strong>Not ready for real data.</strong> Inference runs one image and one crop at a time with no batching; the detector and classifier are called per item. Fine for stubs, too slow for 100k crops. W2 needs batching.</td>
+</tr>
+<tr>
+<td>Reliability</td>
+<td>Retries, heartbeats and stale-job requeue are tested on SQLite only. <code>SKIP LOCKED</code> has never run on Postgres.</td>
+</tr>
+<tr>
+<td>Security</td>
+<td>Adequate for a lab tool, not for the internet. Argon2 passwords, signed HTTP-only cookies, roles, content-sniffed uploads, coordinate rounding for non-admins. Gaps: the default secret key is not refused outside dev; no rate limiting on login; the cookie name is hard-coded in one place.</td>
+</tr>
+<tr>
+<td>Maintainability</td>
+<td>Clear module boundaries; one ADR. The frontend types are hand-written until <code>gen:api</code> runs.</td>
+</tr>
+<tr>
+<td>Platform support</td>
+<td>Windows (native + Docker) and Linux (Docker). <strong>macOS is not supported yet</strong> (§5).</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="42-the-interactive-interface">4.2 The interactive interface</h3>
+<p>The target UI is the one shown in the <a href="https://claude.ai/artifact/1aAvFfs1vuj9RgGWRu8yr2" target="_blank" rel="noopener">prototype page</a>. Can it be built by 13 Dec? <strong>Yes for the core screens, if one person owns the frontend for about 4 weeks.</strong> <span class="chip chip-rec" title="Recommendation">R</span></p>
+<p><strong>Video overlays are the hardest part.</strong> Server-rendered overlay videos (already planned) remove most of that risk.</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Feature</th>
+<th>Effort [R, person-days]</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Essential</strong></td>
+<td>Review queue with real images, reasons, hotkeys, undo (exists; needs undo + real data)</td>
+<td>2</td>
+<td>Core of the product and of the research story</td>
+</tr>
+<tr>
+<td><strong>Essential</strong></td>
+<td>Clip viewer: overlay video + track timeline + MaxN</td>
+<td>4</td>
+<td>Paper 1 made visible</td>
+</tr>
+<tr>
+<td><strong>Essential</strong></td>
+<td>Overview + analytics charts (species, activity by hour, accepted vs all)</td>
+<td>3</td>
+<td>Grade and demo value</td>
+</tr>
+<tr>
+<td><strong>Essential</strong></td>
+<td>Jobs page with live progress (polling exists; server-sent events optional)</td>
+<td>1</td>
+<td>Shows the backend working</td>
+</tr>
+<tr>
+<td><strong>Essential</strong></td>
+<td>CSV / COCO export</td>
+<td>1.5</td>
+<td>Required by the brief</td>
+</tr>
+<tr>
+<td><strong>Essential</strong></td>
+<td>Auth guard, error/empty/loading states, phone layout</td>
+<td>2</td>
+<td>Polish</td>
+</tr>
+<tr>
+<td><strong>Advanced</strong></td>
+<td>Model comparison panel (BioCLIP 2 vs site head; SAM 3 vs MegaDetector + ByteTrack)</td>
+<td>3</td>
+<td>The brief asked for "comparisons"</td>
+</tr>
+<tr>
+<td><strong>Advanced</strong></td>
+<td>Evaluation page: risk–coverage and reliability charts from <code>evaluation_runs</code></td>
+<td>2</td>
+<td>Ties the UI to the research</td>
+</tr>
+<tr>
+<td><strong>Advanced</strong></td>
+<td>"Adapt site" button</td>
+<td>2</td>
+<td>Strong demo moment</td>
+</tr>
+<tr>
+<td><strong>Optional</strong></td>
+<td>Camtrap DP export, PDF report, map, settings UI</td>
+<td>4</td>
+<td>Nice to have</td>
+</tr>
+</tbody>
+</table></div>
+<p>The essential features alone are about 13.5 person-days. With the advanced ones, about 20.5.</p>
+<hr />
+<h2 id="5-hardware-and-cost-audit">5. Hardware and cost audit</h2>
+<h3 id="51-new-machine-macbook-pro-m1-pro-32-gb-512-gb">5.1 New machine: MacBook Pro M1 Pro, 32 GB, 512 GB</h3>
+<p><strong>Impact</strong> [V where linked, R otherwise]:</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Finding</th>
+<th>Consequence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPU</td>
+<td>No CUDA. PyTorch runs on Apple's MPS backend (macOS 14+ for current PyTorch) (<a href="https://developer.apple.com/metal/pytorch" target="_blank" rel="noopener">Apple</a>). M1 Pro GPUs have 14 or 16 cores; the "10-core" figure is probably the CPU <span class="chip chip-assume" title="Assumption">A</span>.</td>
+<td>Light models only, through MPS.</td>
+</tr>
+<tr>
+<td>Precision</td>
+<td>On M1, bfloat16 has no hardware support and reports show it running slower than fp32; fp16 has had correctness bugs on some macOS versions (<a href="https://github.com/pytorch/pytorch/issues/141864" target="_blank" rel="noopener">PyTorch issue</a>; <a href="https://lilting.ch/en/articles/comfyui-qwen-mps-bf16-slowdown" target="_blank" rel="noopener">user benchmark</a>)</td>
+<td><strong>Use fp32 on MPS by default.</strong> Our <code>pick_dtype</code> returns fp32 for anything that isn't CUDA, so it is safe today. Speed is the cost.</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>32 GB unified memory: more room than the T1000's 4 GB</td>
+<td>BioCLIP 2 embedding extraction and MegaDetector should fit easily [A: measure]</td>
+</tr>
+<tr>
+<td>SAM 3</td>
+<td>The official repo needs Triton/CUDA. Apple-Silicon support is an <strong>unmerged</strong> pull request opened 25 Sep 2026: SAM 3.1 video on MPS at roughly 1.3 fps for 720p, ~7 GB peak, on an M5 (<a href="https://github.com/facebookresearch/sam3/pull/627" target="_blank" rel="noopener">PR #627</a>)</td>
+<td><strong>Do not plan SAM 3 on the Mac.</strong> It stays on the lab PC, with molab as backup. Trying the PR branch is a 1-day experiment, not a dependency.</td>
+</tr>
+<tr>
+<td>MegaDetector / DepthSAM on MPS</td>
+<td>Not confirmed by any source I found <span class="chip chip-open" title="Unresolved">U</span></td>
+<td>Test in W2; fall back to CPU (slow but works)</td>
+</tr>
+<tr>
+<td>Docker</td>
+<td>Docker Desktop is free for personal and education use and small businesses (<a href="https://docs.docker.com/subscription/desktop-license/" target="_blank" rel="noopener">Docker docs</a>) <span class="chip chip-verified" title="Verified">V</span>. Containers on a Mac get no GPU [A, widely known].</td>
+<td>Run Postgres/API in Docker if you like; run any model worker <strong>natively</strong></td>
+</tr>
+<tr>
+<td>Our code</td>
+<td><strong>Done 24 Oct.</strong><br><code>ml/wildtriage_ml/device.py</code> picks <code>cuda → mps → cpu</code> (or <code>WT_DEVICE</code>); fp32 on MPS; the MPS cache is cleared on unload.<br>Models declare where they run; SAM 3 and DepthSAM are refused on a Mac.<br>Every PowerShell script has a <code>scripts/native/*.sh</code> twin. The Mac worker sets <code>PYTORCH_ENABLE_MPS_FALLBACK=1</code> and refuses <code>gpu-heavy</code>.<br>Tested with a fake <code>torch</code> and a simulated macOS; ShellCheck clean.</td>
+<td><strong>Not yet run on the real MacBook.</strong> Run <code>bash scripts/native/setup.sh mac</code> there in W2 and record what MegaDetector and BioCLIP 2 do on MPS.</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>512 GB</td>
+<td>Keep raw datasets on the lab PC; the Mac holds code, cached embeddings and small subsets</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Machine roles in two scenarios</strong> (missing information #5):</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Role</th>
+<th>A: MacBook <strong>added</strong> (lab PC + T1000 + Mac + laptop)</th>
+<th>B: MacBook <strong>replaces</strong> the T1000</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Heavy GPU (SAM 3, DepthSAM, embeddings at scale)</td>
+<td>Lab PC; molab as backup</td>
+<td>Lab PC; molab, then Kaggle as backup</td>
+</tr>
+<tr>
+<td>Light GPU (MegaDetector, BioCLIP 2 tests)</td>
+<td>T1000 (CUDA, fp16) and Mac (MPS, fp32)</td>
+<td>Mac (MPS, fp32)</td>
+</tr>
+<tr>
+<td>Exp 1 simulations, analysis</td>
+<td>Any machine (CPU NumPy on cached embeddings)</td>
+<td>Same</td>
+</tr>
+<tr>
+<td>Platform development</td>
+<td>Windows laptop, and the Mac</td>
+<td>Same</td>
+</tr>
+<tr>
+<td>Demo host</td>
+<td>Lab PC</td>
+<td>Lab PC</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Verdict:</strong> the current technical approach stays appropriate. The Mac is a good development and light-inference machine. It does not replace the lab PC.</p>
+<h3 id="52-zero-cost-audit">5.2 Zero-cost audit</h3>
+<p><strong>Category key:</strong>
+- <strong>FOSS:</strong> free and open-source software.
+- <strong>Free service:</strong> free tier of a hosted service.
+- <strong>Gated:</strong> free after an approval.
+- <strong>Paid:</strong> costs money.</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Category</th>
+<th>Cost status</th>
+<th>Limits / conditions</th>
+<th>Risk</th>
+<th>Source / status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python, FastAPI, SQLAlchemy, Alembic, Pydantic, PyTorch, NumPy, pandas, React, Vite, Tailwind, TanStack, uv, Node, PostgreSQL</td>
+<td>FOSS</td>
+<td>Free</td>
+<td>None relevant</td>
+<td>None</td>
+<td>Well-established licences <span class="chip chip-assume" title="Assumption">A</span></td>
+</tr>
+<tr>
+<td>MegaDetector</td>
+<td>FOSS (MIT repo)</td>
+<td>Free</td>
+<td>Weight licence and YOLOv5 AGPL dependency unclear for <em>commercial</em> use</td>
+<td>None for coursework</td>
+<td><span class="chip chip-verified" title="Verified">V</span> repo</td>
+</tr>
+<tr>
+<td>BioCLIP 2, SpeciesNet, Qwen3-VL</td>
+<td>FOSS (MIT / Apache-2.0)</td>
+<td>Free</td>
+<td>—</td>
+<td>None</td>
+<td><span class="chip chip-verified" title="Verified">V</span> 18 Oct</td>
+</tr>
+<tr>
+<td>SAM 3 / 3.1 weights</td>
+<td>Gated (Hugging Face)</td>
+<td>Free</td>
+<td>SAM License; approval needed</td>
+<td>Approval delay</td>
+<td><span class="chip chip-verified" title="Verified">V</span> 18 Oct</td>
+</tr>
+<tr>
+<td>DepthSAM</td>
+<td>FOSS code + NC dependency</td>
+<td>Free</td>
+<td>Depth-Anything-V2-Large is non-commercial</td>
+<td>None for coursework</td>
+<td><span class="chip chip-verified" title="Verified">V</span> 18 Oct</td>
+</tr>
+<tr>
+<td>SA-FARI annotations</td>
+<td>Gated (Hugging Face)</td>
+<td>Free</td>
+<td>CC-BY-NC-4.0</td>
+<td>Approval delay</td>
+<td><span class="chip chip-verified" title="Verified">V</span> 18 Oct</td>
+</tr>
+<tr>
+<td>SA-FARI frames/videos</td>
+<td>Public bucket</td>
+<td><strong>Free, anonymous read verified</strong></td>
+<td>—</td>
+<td>None found</td>
+<td><span class="chip chip-verified" title="Verified">V</span> 24 Oct: anonymous listing works</td>
+</tr>
+<tr>
+<td>LILA datasets</td>
+<td>Public buckets (GCP, AWS, Azure)</td>
+<td><strong>Free, anonymous read verified</strong> (GCP); AWS copy uses <code>--no-sign-request</code> (<a href="https://lila.science/faq" target="_blank" rel="noopener">LILA FAQ</a>)</td>
+<td>Per-dataset licences</td>
+<td>Time and disk, not money</td>
+<td><span class="chip chip-verified" title="Verified">V</span> 24 Oct</td>
+</tr>
+<tr>
+<td>Hugging Face account</td>
+<td>Free service</td>
+<td>Free</td>
+<td>—</td>
+<td>—</td>
+<td><span class="chip chip-assume" title="Assumption">A</span></td>
+</tr>
+<tr>
+<td>GitHub</td>
+<td>Free service</td>
+<td>Free</td>
+<td><strong>Public repos: unlimited standard Actions minutes. Private repos: 2,000 min/month</strong> (Linux 1×, Windows 2×, macOS 10×) (<a href="https://merginit.com/blog/20062026-free-cicd-comparison" target="_blank" rel="noopener">third-party summary</a>; <a href="https://github.blog/changelog/2025-12-16-coming-soon-simpler-pricing-and-a-better-experience-for-github-actions/" target="_blank" rel="noopener">GitHub changelog</a>)</td>
+<td>Our CI is Linux-only, ~5 min/run, so private is fine (~400 runs/month)</td>
+<td><span class="chip chip-verified" title="Verified">V</span> third-party; official billing page not read</td>
+</tr>
+<tr>
+<td>Docker Desktop</td>
+<td>Free for personal use, education and small businesses</td>
+<td>Free for this project</td>
+<td>Paid for larger commercial organisations</td>
+<td>None</td>
+<td><span class="chip chip-verified" title="Verified">V</span></td>
+</tr>
+<tr>
+<td>molab</td>
+<td>Free service (preview)</td>
+<td>Free "as long as usage is reasonable"</td>
+<td>96 GB GPU; 12 h sessions; 90 min idle shutdown; persistence, secrets and card requirement <strong>not stated</strong></td>
+<td>Preview terms can change</td>
+<td><span class="chip chip-verified" title="Verified">V</span> blog</td>
+</tr>
+<tr>
+<td>Kaggle notebooks</td>
+<td>Free service</td>
+<td>Free</td>
+<td>~30 GPU h/week (T4/P100), 9–12 h sessions; sources disagree on whether the quota is fixed</td>
+<td>Quota changes</td>
+<td><span class="chip chip-verified" title="Verified">V</span> third-party</td>
+</tr>
+<tr>
+<td>Google Colab (free tier)</td>
+<td>Free service</td>
+<td>Free</td>
+<td>Dynamic, unguaranteed limits (<a href="https://www.hivenet.com/post/google-colaboratory-gpu-complete-guide-to-free-cloud-gpu-access-and-limitations" target="_blank" rel="noopener">summary</a>)</td>
+<td>GPU may be unavailable</td>
+<td><span class="chip chip-verified" title="Verified">V</span> secondary</td>
+</tr>
+<tr>
+<td>Hugging Face Spaces (CPU basic)</td>
+<td>Free service</td>
+<td>Free</td>
+<td>2 vCPU, 16 GB RAM, 50 GB <strong>non-persistent</strong> disk; sleeps after 48 h idle; persistent storage is paid (<a href="https://huggingface.co/docs/hub/en/spaces-overview" target="_blank" rel="noopener">HF docs</a>)</td>
+<td>One forum report of quota errors</td>
+<td><span class="chip chip-verified" title="Verified">V</span> docs</td>
+</tr>
+<tr>
+<td>Report writing</td>
+<td>FOSS</td>
+<td>Free</td>
+<td>Use local LaTeX (TeX Live) or Typst; Overleaf free-plan limits not checked</td>
+<td>—</td>
+<td><span class="chip chip-assume" title="Assumption">A</span></td>
+</tr>
+<tr>
+<td>arXiv</td>
+<td>Free service</td>
+<td>Free</td>
+<td>Endorsement needed for first-time submitters</td>
+<td>Finding an endorser</td>
+<td><span class="chip chip-verified" title="Verified">V</span> partly</td>
+</tr>
+<tr>
+<td><strong>Conference presentation</strong> (CVPR and its workshops)</td>
+<td><strong>Paid</strong></td>
+<td><strong>$525–$810 student in-person (2026 rates); virtual does not cover a paper</strong></td>
+<td>Required for every accepted paper</td>
+<td><strong>Breaks zero-cost if you publish</strong></td>
+<td><span class="chip chip-verified" title="Verified">V</span></td>
+</tr>
+<tr>
+<td><strong>Journal open-access fees</strong> (MEE, RSEC)</td>
+<td><strong>Paid</strong></td>
+<td><strong>Up to $3,500 / $3,950</strong></td>
+<td>Waivers may exist</td>
+<td><strong>Breaks zero-cost if you publish</strong></td>
+<td><span class="chip chip-verified" title="Verified">V</span> DOAJ</td>
+</tr>
+<tr>
+<td>Claude (this assistant)</td>
+<td>Your own subscription</td>
+<td>Not a project cost, but not zero if your plan is paid</td>
+<td>—</td>
+<td>—</td>
+<td><span class="chip chip-rec" title="Recommendation">R</span></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Findings:</strong>
+- <strong>Development, research and the demo can stay at $0</strong> with what is planned.
+- <strong>The only real monetary exposure is publishing.</strong>
+- <strong>Rule: never attach a credit card</strong> to Google Cloud, Hugging Face, molab or Kaggle accounts. Download from the public buckets anonymously, over HTTPS or with <code>--no-sign-request</code>, so no account can accrue charges.</p>
+<hr />
+<h2 id="6-portfolio-and-commercial-assessment">6. Portfolio and commercial assessment</h2>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>View</th>
+<th>Strengths</th>
+<th>Weaknesses</th>
+<th>What would change it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Academic</strong></td>
+<td>A clear, honest research question; good statistical tools (conformal risk control, ACI); real public data; a leakage-aware protocol</td>
+<td>No results; a combination of existing methods; small scale</td>
+<td>§3.3 reframing + real multi-site results</td>
+</tr>
+<tr>
+<td><strong>Technical</strong></td>
+<td>A real full-stack system: queue, migrations, role-based auth, audit log, VRAM-aware model registry, three-machine design, CI</td>
+<td>Never run with real models or Postgres; no batching; no Mac support</td>
+<td>W2–W4 real-model integration and batching</td>
+</tr>
+<tr>
+<td><strong>Portfolio</strong></td>
+<td>Rare combination of research, engineering and product thinking in one project, which recruiters notice</td>
+<td><strong>A lot of the current code and docs were written by Claude in this session.</strong> In interviews and a viva, examiners and recruiters will ask about design choices. Each member should own and extend specific parts, and disclose AI help if the course requires it [U #7].</td>
+<td>Members author the real-model integration, experiments and the UI work themselves; keep a design log</td>
+</tr>
+<tr>
+<td><strong>Commercial</strong></td>
+<td>A real pain point (review backlog); the error-controlled auto-accept angle is not described by the competitors I checked; self-hosted and offline</td>
+<td>Wildlife Insights and AddaxAI are free and established; Zamba already does video; key components are non-commercial (SA-FARI, DepthSAM's depth model, OWL); no user validation; no money to host</td>
+<td>Interview 3–5 camera-trap users in Pakistan (e.g. WWF-Pakistan, university ecology labs) [A: plausible contacts]; licence-clean model set</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Commercial verdict</strong> <span class="chip chip-rec" title="Recommendation">R</span>. Not a viable business by December, and probably not as a standalone product. The realistic commercial-adjacent outcomes:
+1. An <strong>open-source tool</strong> that existing platforms could adopt the method from.
+2. A <strong>plugin or methodology</strong> for existing tools: calibrated auto-acceptance as a feature.
+3. A basis for <strong>grant-funded or consultancy</strong> work.</p>
+<p>All three are compatible with zero cost. None is guaranteed.</p>
+<hr />
+<h2 id="7-risk-register">7. Risk register</h2>
+<p>Ranked by severity, where severity combines likelihood and impact.</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Risk</th>
+<th>Likelihood</th>
+<th>Impact</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Real models and data still untouched at the end of W1;</strong> the research side slips into November</td>
+<td>High (it is happening)</td>
+<td>High</td>
+<td>W2 is model-and-data-first (§8). The platform member pauses UI features to help. Daily check-in until the first real predictions show in the UI.</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Unblockers not done:</strong> HF access, IT answers, instructor approval</td>
+<td>Unknown</td>
+<td>High</td>
+<td>Do all of them Monday 26 Oct; record the answers in the README.</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Scope larger than capacity:</strong> the estimated total is ~60 person-days, and capacity is unknown</td>
+<td>Medium–High</td>
+<td>High</td>
+<td>Use §8's P0 list and cut lines; decide at the W4 gate.</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Research finding is null:</strong> no strategy beats least-confidence</td>
+<td>Medium–High (the simulator hints at it)</td>
+<td>Medium</td>
+<td>§3.3 reframing; negative results are publishable when framed as the guarantee-failure and budget-split study.</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Paper 2 dropped by the scope ladder</strong></td>
+<td>Medium</td>
+<td>High (course)</td>
+<td>Make a minimal DepthSAM reproduction and camera-trap evaluation P0 (3 person-days).</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Lab PC unavailable or locked down</strong></td>
+<td>Unknown</td>
+<td>High</td>
+<td>molab, then Kaggle for SAM 3 and embedding batches; resumable jobs; run SA-FARI early.</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>Publication costs</strong> conflict with zero-cost</td>
+<td>High if you publish</td>
+<td>Medium</td>
+<td>arXiv preprint; ask for department funding or fee waivers; choose venues accordingly.</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>Academic integrity / AI-assistance rules</strong></td>
+<td>Unknown</td>
+<td>High</td>
+<td>Check the course policy now; disclose as required; members author the remaining core parts.</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>No git, repo in OneDrive:</strong> a lost or overwritten file</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Move the repo and <code>git init</code> today; push to GitHub.</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>Mac incompatibilities</strong> (MPS dtype, SAM 3, MegaDetector)</td>
+<td>Medium</td>
+<td>Low–Medium</td>
+<td>fp32 on MPS; SAM 3 stays off the Mac; CPU fallback.</td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>Data download and disk</strong> (LILA subsets, SA-FARI test) slower than expected</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Crops only; 30 sites; SA-FARI test only; start in W2.</td>
+</tr>
+<tr>
+<td>12</td>
+<td><strong>Free tiers change</strong> (molab preview, Kaggle/Colab quotas)</td>
+<td>Low–Medium</td>
+<td>Medium</td>
+<td>Two fallbacks; test molab in W2.</td>
+</tr>
+<tr>
+<td>13</td>
+<td><strong>Licence breach in a public repo or demo</strong></td>
+<td>Low</td>
+<td>Medium</td>
+<td>No data or weights in git; attribution for SA-FARI; non-commercial notice.</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="8-revised-implementation-roadmap">8. Revised implementation roadmap</h2>
+<p><strong>Effort estimate for the remaining P0 work</strong> [R, person-days]:</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Work item</th>
+<th>Estimate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Real-model integration and batching</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Postgres runtime</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Mac support</td>
+<td>1</td>
+</tr>
+<tr>
+<td>StreamTrap-mini data and embeddings</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Exp 1 (real data, baselines, reframed analysis)</td>
+<td>8</td>
+</tr>
+<tr>
+<td>Exp 2 (SA-FARI subset)</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Exp 3 minimal (DepthSAM)</td>
+<td>3</td>
+</tr>
+<tr>
+<td>UI essentials</td>
+<td>13.5</td>
+</tr>
+<tr>
+<td>Tests and E2E</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Report and demo</td>
+<td>6</td>
+</tr>
+<tr>
+<td><strong>P0 total</strong></td>
+<td><strong>≈50</strong></td>
+</tr>
+<tr>
+<td>Advanced UI</td>
+<td>7</td>
+</tr>
+<tr>
+<td>Adaptation in the app</td>
+<td>2</td>
+</tr>
+<tr>
+<td><strong>P1 total</strong></td>
+<td><strong>≈9</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>Seven weeks remain (26 Oct – 13 Dec), and team capacity is unknown [U #6]:
+- At 3 days/week/person: about 42 person-days. P0 does not fit, so cut further at the W4 gate.
+- At 4 days/week/person: about 56 person-days. P0 fits, plus a little P1.</p>
+<p><strong>Roles:</strong>
+- <strong>A</strong> is the ML and research member.
+- <strong>B</strong> is the platform and UI member.</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Milestone</th>
+<th>Dates</th>
+<th>Deliverables (validation criteria)</th>
+<th>Depends on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>M0: Unblock</strong></td>
+<td>Mon 26 – Tue 27 Oct</td>
+<td>Repo moved and in git (private GitHub repo, CI green). HF access requested (screenshot in README). IT, instructor and rubric answers written into README (§0 #1–8). Mac support patch (<code>cuda → mps → cpu</code>; <code>.sh</code> scripts): <strong>code done 24 Oct</strong>; still to do: run <code>setup.sh mac</code> on the MacBook.</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>M1: First real predictions</strong></td>
+<td>by Sun 1 Nov</td>
+<td>MegaDetector + BioCLIP 2 run on 50 real LILA images on the Mac or T1000 <strong>and</strong> through the app on the lab PC: predictions visible in the review UI. Postgres runs natively. Batching added. LILA site list + manifests committed (≥30 sites, ≥3 datasets). SAM 3 on 3 SA-FARI clips (lab PC or molab), or a written blocker.</td>
+<td>M0; HF access for SAM 3</td>
+</tr>
+<tr>
+<td><strong>M2: Real data at scale</strong></td>
+<td>by Sun 8 Nov</td>
+<td>Embeddings cached for all StreamTrap-mini sites (lab PC). Exp 1 baselines on dev sites, including StreamTrap's adapt-or-skip rule and fixed-threshold routing. SA-FARI test subset (≥150 clips) through SAM 3 with the official evaluator. DepthSAM reproduces COD10K-test numbers within a stated tolerance. UI: clip viewer with overlay video.</td>
+<td>M1</td>
+</tr>
+<tr>
+<td><strong>M3: MVP + research gate</strong></td>
+<td>by Sun 15 Nov</td>
+<td>Full loop with real models on a demo set (≥200 images, ≥10 clips). <strong>Gate:</strong> dev-site results decide the framing (§3.3): if no strategy beats least-confidence, the paper becomes the budget-split and guarantee-failure study. Apply the cut list if behind.</td>
+<td>M2</td>
+</tr>
+<tr>
+<td><strong>M4: Experiments complete</strong></td>
+<td>by Sun 22 Nov</td>
+<td>Exp 1 ablations (budget split, α, day/night, pooling). Exp 2 MaxN counting vs MegaDetector + ByteTrack. Exp 3 camera-trap camouflage crops (IoU vs SAM 3). UI: charts, exports, comparison panel.</td>
+<td>M3</td>
+</tr>
+<tr>
+<td><strong>M5: Frozen results + hardening</strong></td>
+<td>by Sun 29 Nov</td>
+<td>One run on the held-out test sites from a tagged commit, with confidence intervals. Playwright happy path in CI. Postgres-backed tests. Efficiency table (lab PC, Mac, T1000 if available).</td>
+<td>M4</td>
+</tr>
+<tr>
+<td><strong>M6: Freeze + write-up</strong></td>
+<td>Mon 30 Nov – Sun 6 Dec</td>
+<td>Feature freeze Wed 2 Dec. Course report written <strong>in workshop-paper format</strong> (8 pages + appendix). Demo video. Optional public read-only demo (Hugging Face Space, CPU basic, stubs + precomputed real outputs).</td>
+<td>M5</td>
+</tr>
+<tr>
+<td><strong>M7: Submit course work</strong></td>
+<td>7 – 13 Dec</td>
+<td>Rehearsed demo twice; checklist in plan §13 passes; 2 buffer days.</td>
+<td>M6</td>
+</tr>
+<tr>
+<td><strong>After the course</strong> (optional, toward publication)</td>
+<td>Jan – Mar 2027</td>
+<td>Scale to ≥100 sites; add a second backbone; real related-work review; supervisor feedback; arXiv preprint; submit to a workshop or journal <strong>only if fees are covered</strong> (§3.5).</td>
+<td>Results from M5</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Weekly load split</strong> <span class="chip chip-rec" title="Recommendation">R</span>:
+- <strong>W2:</strong> both members on M1. B pairs with A on running real models; UI work pauses.
+- <strong>W3–W5:</strong> A on experiments; B on the UI and hardening.
+- <strong>W6:</strong> both on the write-up and demo.</p>
+<p><strong>Cut list,</strong> applied in order at the M3 gate if behind:
+1. Advanced UI comparisons.
+2. In-app adaptation.
+3. Server-sent events.
+4. Exp 2 full set (keep a 150-clip subset).
+5. Exp 1 extra backbones.</p>
+<p><strong>Never cut:</strong>
+- the three-paper coverage: SAM 3 on SA-FARI, DepthSAM reproduction, the StreamTrap protocol;
+- Exp 1 on real sites;
+- the review loop;
+- tests;
+- the report.</p>
+<hr />
+<h2 id="9-recommended-changes-to-the-existing-plan">9. Recommended changes to the existing plan</h2>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Change</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Retain</strong></td>
+<td>Paper set (SA-FARI, DepthSAM, StreamTrap); architecture; Postgres queue; triage design; leakage rules; licence manifest; molab fallback</td>
+<td>Sound and verified</td>
+</tr>
+<tr>
+<td><strong>Improve</strong></td>
+<td>Exp 1 research question → budget split and guarantee failure (§3.3)</td>
+<td>The simulator evidence; less crowded framing</td>
+</tr>
+<tr>
+<td><strong>Improve</strong></td>
+<td>Inference: batching for the detector and classifier crops</td>
+<td>Needed to process real data in time</td>
+</tr>
+<tr>
+<td><strong>Improve</strong></td>
+<td>Device handling for Apple Silicon (fp32 on MPS); bash scripts</td>
+<td>New hardware</td>
+</tr>
+<tr>
+<td><strong>Improve</strong></td>
+<td>Report format → workshop-paper format from the start</td>
+<td>The same document serves the course and a later submission</td>
+</tr>
+<tr>
+<td><strong>Replace</strong></td>
+<td>"Mini human study" as evidence → simulated reviewer cost + a small sanity check</td>
+<td>Too few people for claims</td>
+</tr>
+<tr>
+<td><strong>Promote</strong></td>
+<td>DepthSAM reproduction + camera-trap camouflage evaluation → <strong>P0 (minimal)</strong></td>
+<td>Course requires all three papers</td>
+</tr>
+<tr>
+<td><strong>Promote</strong></td>
+<td>Unblocking tasks (access, IT, instructor, rubric, git) → <strong>M0, this Monday</strong></td>
+<td>They gate everything</td>
+</tr>
+<tr>
+<td><strong>Postpone</strong></td>
+<td>Aerial module → P2</td>
+<td>Not one of the papers; scope</td>
+</tr>
+<tr>
+<td><strong>Postpone</strong></td>
+<td>LoRA, VLM expert, Camtrap DP, map, PDF report, GPU Docker image</td>
+<td>Low value per day for this deadline</td>
+</tr>
+<tr>
+<td><strong>Remove</strong></td>
+<td>Further work on the prototype and plan pages</td>
+<td>Diminishing returns</td>
+</tr>
+<tr>
+<td><strong>Add</strong></td>
+<td>Ask the department about funding registration or journal fees; ask a faculty member about arXiv endorsement</td>
+<td>Zero-cost and publication goals</td>
+</tr>
+<tr>
+<td><strong>Add</strong></td>
+<td>AI-assistance disclosure check; a design log per member</td>
+<td>Integrity and portfolio</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="10-final-recommendation">10. Final recommendation</h2>
+<p><strong>Spend the next two weeks on the parts that cannot be faked:</strong> real models on real data for all three papers, and Exp 1 on real camera sites. The platform is already ahead. Its value now depends on showing real predictions and real triage numbers.</p>
+<ol>
+<li><strong>Monday 26 Oct (M0).</strong> Clear every unblocker in §0 (access, IT, instructor, rubric, AI policy, funding), move the repo into git, and add Mac support. These are cheap, and every later milestone depends on them.</li>
+<li><strong>By 1 Nov (M1).</strong> See real MegaDetector and BioCLIP 2 predictions in the review UI, and SAM 3 on three SA-FARI clips. If that slips past 8 Nov, the cut list applies early.</li>
+<li><strong>Reframe the research</strong> around how a fixed review budget should be split between certifying and learning, and how often the guarantees fail at real sites. It survives a null result, it is honest about novelty, and it builds directly on StreamTrap's open question.</li>
+<li><strong>Keep all three papers in the deliverable</strong> by making a minimal DepthSAM reproduction P0.</li>
+<li><strong>Write the course report as a workshop paper</strong> from the start. Plan a zero-cost arXiv preprint in early 2027. Submit to a CVPR 2027 workshop or an ecology journal only if someone else covers the fees.</li>
+<li><strong>Make the work yours.</strong> Each member should author and be able to explain the real-model integration, the experiments and the UI work. That matters for the grade, for integrity, and for every interview where this project comes up.</li>
+</ol>
+<p>If those six things happen, the realistic result by 13 December is:
+- an excellent course project;
+- a portfolio piece that shows research, engineering and product sense together;
+- a credible path to a workshop paper or journal article in spring 2027.</p>
+<p>The project is not a business yet, and that is fine for this timeframe.</p>
+  </article>
+</div>
+<footer><div>Source: <code>wildtriage/docs/AUDIT_2026-10-24.md</code> in the project repository.</div></footer>
+
+</body></html>

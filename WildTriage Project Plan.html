@@ -1,0 +1,1775 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>WildTriage Project Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: field-notebook document. Sticky contents rail on wide screens, a trail-camera
+   data strip as the masthead, chips for the plan's evidence labels. */
+:root {
+  --bg: #f4f6f3;          /* lichen-tinted paper */
+  --surface: #ffffff;
+  --ink: #18221d;
+  --muted: #5a6760;
+  --rule: #d5ddd7;
+  --accent: #1f5f4b;      /* canopy green */
+  --accent-ink: #ffffff;
+  --strip: #101714;       /* camera-trap info bar */
+  --strip-ink: #e8efe9;
+  --ir: #c9821f;          /* IR-flash amber */
+  --code-bg: #e9eee9;
+  --chip-v: #1f6b45; --chip-r: #2b5c8a; --chip-a: #9a6200; --chip-u: #a3352e;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1512; --surface: #151d19; --ink: #e3eae5; --muted: #9aa9a0; --rule: #2a3530;
+    --accent: #6fbf9c; --accent-ink: #0f1512; --strip: #060a08; --strip-ink: #d9e4dc; --ir: #e2a24a;
+    --code-bg: #1b2520; --chip-v: #6cc895; --chip-r: #7fb2e5; --chip-a: #e3a948; --chip-u: #f08a80;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1512; --surface: #151d19; --ink: #e3eae5; --muted: #9aa9a0; --rule: #2a3530;
+  --accent: #6fbf9c; --accent-ink: #0f1512; --strip: #060a08; --strip-ink: #d9e4dc; --ir: #e2a24a;
+  --code-bg: #1b2520; --chip-v: #6cc895; --chip-r: #7fb2e5; --chip-a: #e3a948; --chip-u: #f08a80;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 15.5px/1.6 var(--font-body); }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--ir); outline-offset: 2px; border-radius: 2px; }
+
+.strip { background: var(--strip); color: var(--strip-ink); font: 500 12px/1 var(--font-mono);
+  letter-spacing: .08em; text-transform: uppercase;
+  padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.strip-inner { max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 6px 22px; }
+.strip .ir { color: var(--ir); }
+header.mast { padding-block: 40px 28px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--rule); }
+.mast-inner { max-width: 1240px; margin: 0 auto; display: grid; gap: 12px; }
+.mast h1 { font: 800 clamp(30px, 5vw, 50px)/1.04 var(--font-display); font-stretch: 112%; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+.mast p { margin: 0; max-width: 68ch; color: var(--muted); font-size: 17px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px;
+  padding-block: 32px 80px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; max-height: calc(100vh - 32px); overflow: auto; }
+nav.toc h2 { font: 700 12px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+nav.toc a { display: block; padding: 5px 10px; border-left: 2px solid var(--rule); color: var(--ink); text-decoration: none; font-size: 13.5px; line-height: 1.35; }
+nav.toc a:hover { border-left-color: var(--accent); color: var(--accent); }
+details.toc-mobile { display: none; }
+
+article { min-width: 0; }
+article > :first-child { margin-top: 0; }
+article h2 { font: 750 26px/1.15 var(--font-display); font-stretch: 108%; margin: 56px 0 14px; padding-top: 18px; border-top: 2px solid var(--ink); text-wrap: balance; scroll-margin-top: 16px; }
+article h3 { font: 700 18.5px/1.25 var(--font-display); margin: 30px 0 10px; text-wrap: balance; }
+article p, article li { max-width: 76ch; }
+article ul, article ol { padding-left: 1.3em; }
+article li { margin: 3px 0; }
+article hr { display: none; }
+strong { font-weight: 600; }
+code { font: 500 0.88em/1.4 var(--font-mono); background: var(--code-bg); padding: 1px 5px; border-radius: 3px; overflow-wrap: anywhere; }
+.scroll { overflow-x: auto; margin: 16px 0 22px; max-width: 100%; }
+pre { margin: 0; background: var(--code-bg); padding: 14px 16px; border-radius: 4px; font: 400 12.5px/1.45 var(--font-mono); }
+pre code { background: none; padding: 0; font: inherit; overflow-wrap: normal; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; background: var(--surface); font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--rule); min-width: 120px; }
+th { font: 600 12px/1.3 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); border-bottom: 2px solid var(--ink); background: var(--bg); }
+td:first-child { font-weight: 500; }
+tr:hover td { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+
+.chip { display: inline-block; font: 600 10.5px/1 var(--font-mono); padding: 3px 5px 2px; border-radius: 3px;
+  border: 1px solid currentColor; vertical-align: 2px; margin: 0 1px; }
+.chip-verified { color: var(--chip-v); } .chip-rec { color: var(--chip-r); }
+.chip-assume { color: var(--chip-a); } .chip-open { color: var(--chip-u); }
+li.todo { list-style: none; margin-left: -1.3em; display: flex; gap: 10px; align-items: baseline; }
+li.todo .box { flex: none; width: 13px; height: 13px; border: 1.5px solid var(--muted); border-radius: 2px; transform: translateY(2px); }
+
+footer { border-top: 1px solid var(--rule); color: var(--muted); font-size: 13px;
+  padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+footer div { max-width: 1240px; margin: 0 auto; }
+
+@media (max-width: 980px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  nav.toc { display: none; }
+  details.toc-mobile { display: block; border: 1px solid var(--rule); border-radius: 4px; background: var(--surface); padding: 10px 14px; }
+  details.toc-mobile summary { cursor: pointer; font: 600 13px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .08em; }
+  details.toc-mobile ol { margin: 10px 0 0; padding-left: 1.2em; }
+  article h2 { font-size: 22px; margin-top: 40px; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="strip" role="presentation">
+  <div class="strip-inner">
+    <span>CAM WT-01</span><span>2026-10-18</span><span>8 weeks · 19 Oct – 13 Dec</span><span>2 people · 3 machines</span><span class="ir">RTX 4000 Ada 20 GB</span><span>3 papers · CVPR / CVPR / ECCV</span>
+  </div>
+</div>
+<header class="mast">
+  <div class="mast-inner">
+    <h1>WildTriage: Research-Validated Plan for an 8-Week Wildlife Monitoring Product</h1>
+    <p>A camera-trap triage and verification platform built on SA-FARI, DepthSAM and StreamTrap, with one testable research contribution: review-budgeted, risk-controlled triage with site adaptation.</p>
+    <div class="legend" aria-label="Evidence labels">
+      <span><span class="chip chip-verified">V</span> verified against the linked source</span>
+      <span><span class="chip chip-rec">R</span> recommendation</span>
+      <span><span class="chip chip-assume">A</span> assumption to check</span>
+      <span><span class="chip chip-open">U</span> unresolved</span>
+    </div>
+  </div>
+</header>
+<div class="wrap">
+  <nav class="toc" aria-label="Contents"><h2>Contents</h2><ol><li><a href="#context">Context</a></li>
+<li><a href="#0-before-you-start">0. Before you start</a></li>
+<li><a href="#1-executive-verdict">1. Executive verdict</a></li>
+<li><a href="#2-paper-validation">2. Paper validation</a></li>
+<li><a href="#3-research-direction-and-novelty">3. Research direction and novelty</a></li>
+<li><a href="#4-product-specification">4. Product specification</a></li>
+<li><a href="#5-system-architecture">5. System architecture</a></li>
+<li><a href="#6-technology-stack">6. Technology stack</a></li>
+<li><a href="#7-dataset-and-model-strategy">7. Dataset and model strategy</a></li>
+<li><a href="#8-eight-week-roadmap">8. Eight-week roadmap</a></li>
+<li><a href="#9-research-and-evaluation-plan">9. Research and evaluation plan</a></li>
+<li><a href="#10-uiux-blueprint">10. UI/UX blueprint</a></li>
+<li><a href="#11-repository-and-database-design">11. Repository and database design</a></li>
+<li><a href="#12-risk-register-top-risks">12. Risk register (top risks)</a></li>
+<li><a href="#13-final-acceptance-checklist">13. Final acceptance checklist</a></li>
+<li><a href="#14-repository-skeleton-status">14. Repository skeleton status</a></li></ol></nav>
+  <article>
+    <details class="toc-mobile"><summary>Contents</summary><ol><li><a href="#context">Context</a></li>
+<li><a href="#0-before-you-start">0. Before you start</a></li>
+<li><a href="#1-executive-verdict">1. Executive verdict</a></li>
+<li><a href="#2-paper-validation">2. Paper validation</a></li>
+<li><a href="#3-research-direction-and-novelty">3. Research direction and novelty</a></li>
+<li><a href="#4-product-specification">4. Product specification</a></li>
+<li><a href="#5-system-architecture">5. System architecture</a></li>
+<li><a href="#6-technology-stack">6. Technology stack</a></li>
+<li><a href="#7-dataset-and-model-strategy">7. Dataset and model strategy</a></li>
+<li><a href="#8-eight-week-roadmap">8. Eight-week roadmap</a></li>
+<li><a href="#9-research-and-evaluation-plan">9. Research and evaluation plan</a></li>
+<li><a href="#10-uiux-blueprint">10. UI/UX blueprint</a></li>
+<li><a href="#11-repository-and-database-design">11. Repository and database design</a></li>
+<li><a href="#12-risk-register-top-risks">12. Risk register (top risks)</a></li>
+<li><a href="#13-final-acceptance-checklist">13. Final acceptance checklist</a></li>
+<li><a href="#14-repository-skeleton-status">14. Repository skeleton status</a></li></ol></details>
+    <blockquote>
+<p><strong>Update, 24 Oct 2026:</strong> read <a href="AUDIT_2026-10-24.md"><code>AUDIT_2026-10-24.md</code></a> first. It supersedes this plan in several places:
+- the roadmap (§8 there);
+- the research framing (§3.3 there);
+- the priority of DepthSAM (now minimal P0) and the aerial module (now P2);
+- machine roles, now including the MacBook.</p>
+<p>Everything else here still stands.</p>
+</blockquote>
+<h2 id="context">Context</h2>
+<p><strong>Course project.</strong> The project is a computer vision course project (FAST NU, Semester 7). The team is <strong>2 people</strong> with <strong>8 weeks</strong>, starting Monday <strong>19 Oct 2026</strong> and ending <strong>13 Dec 2026</strong>. Shift the dates if your start date differs.</p>
+<p><strong>Compute: three machines, used for different jobs.</strong></p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Machine</th>
+<th>GPU</th>
+<th>CPU / RAM / free disk</th>
+<th>Role in the project</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Lab PC</strong>: Dell Precision 3680; Windows 11 Enterprise, domain-joined (university-managed)</td>
+<td><strong>NVIDIA RTX 4000 Ada, 20 GB</strong> (Ada; bf16)</td>
+<td>i7-14700 (20 cores) / 32 GB / ~1.7 TB</td>
+<td><strong>Heavy GPU work and the demo host.</strong> Runs SAM 3 video, DepthSAM, BioCLIP 2 embedding extraction at scale, the SA-FARI evaluation and the final experiment runs. Stores all datasets. Worker queues: <code>gpu</code> + <code>gpu-heavy</code>.</td>
+</tr>
+<tr>
+<td><strong>Teammate's PC</strong></td>
+<td><strong>NVIDIA Quadro T1000, 4 GB</strong> (Turing: fp16, <strong>no bf16</strong>)</td>
+<td>Intel Core i7 (9th gen) / 32 GB / <span class="chip chip-assume" title="Assumption">A</span></td>
+<td><strong>Light GPU development.</strong> Runs MegaDetector and BioCLIP 2 (fp16, small batches), adapter "golden" tests, data preparation (32 GB RAM) and Exp 1 runs. Worker queue: <code>gpu</code>. Not for SAM 3 or DepthSAM.</td>
+</tr>
+<tr>
+<td><strong>MacBook Pro</strong> (added 24 Oct): M1 Pro</td>
+<td>Apple GPU via MPS (no CUDA); 32 GB unified memory</td>
+<td>32 GB / 512 GB disk</td>
+<td><strong>Light models and development.</strong> MegaDetector and BioCLIP 2 in fp32 on MPS; Exp 1 on cached embeddings. Worker queue: <code>gpu</code>. <strong>Not for SAM 3 or DepthSAM</strong> (CUDA only).</td>
+</tr>
+<tr>
+<td><strong>Your laptop</strong>: HP 15s-fq5xxx</td>
+<td>Intel Iris Xe (no CUDA)</td>
+<td>i5-1235U / 20 GB / ~180 GB</td>
+<td><strong>Platform development.</strong> Backend, frontend, Docker (installed) with CPU stub models, CI and docs. Exp 1 policy simulations on <em>cached embeddings</em> (NumPy on CPU). <strong>No raw datasets.</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Design consequences</strong> <span class="chip chip-rec" title="Recommendation">R</span>:
+- The design assumes <strong>20 GB of VRAM at most</strong>. It must not assume admin rights, Docker or WSL2 on the lab PC (see §0 and §12).
+- <strong>Job queues are routed by capability.</strong> Light models run on any CUDA machine; heavy experts run on the lab PC only.
+- <strong>Each worker sets its own VRAM budget and dtype.</strong> On the lab PC: 18 GB, bf16. On the T1000: 3.5 GB, fp16.
+- <strong>Only the lab PC handles raw media.</strong> The other two machines receive cached embeddings and results (small files, shared via a team drive or git).</p>
+<p><strong>Suggested ownership</strong> (swap if you prefer):
+- <strong>Member A (ML &amp; research)</strong> works on the teammate's T1000 machine plus scheduled lab-PC sessions.
+- <strong>Member B (product &amp; platform)</strong> works on your laptop.</p>
+<p><strong>Goal.</strong> Turn three 2026 papers into one product that is coherent, evaluated, and defensible as research. It should not be three separate demos.</p>
+<p><strong>How this plan was made.</strong>
+- The papers and their resources were checked on the web on <strong>18 Oct 2026</strong>: CVF Open Access, arXiv, GitHub, Hugging Face and LILA. Anything marked <span class="chip chip-verified" title="Verified">V</span> links to the page it came from.
+- The team decided to <strong>swap Paper 3</strong>, a CVPR <em>Workshop</em> paper, for an <strong>ECCV 2026 main-conference paper</strong> (see §2.4). This still needs instructor approval.
+- A repository skeleton that follows §5, §6 and §11 lives next to this document (<code>wildtriage/</code>).</p>
+<p><strong>Label legend</strong> (used throughout):
+- <strong class="chipwrap"><span class="chip chip-verified" title="Verified">V</span></strong> verified from the linked source on 18 Oct 2026.
+- <strong class="chipwrap"><span class="chip chip-rec" title="Recommendation">R</span></strong> recommendation.
+- <strong class="chipwrap"><span class="chip chip-assume" title="Assumption">A</span></strong> assumption that needs checking.
+- <strong class="chipwrap"><span class="chip chip-open" title="Unresolved">U</span></strong> unresolved.</p>
+<hr />
+<h2 id="0-before-you-start">0. Before you start</h2>
+<ol>
+<li><strong>Move the repo out of OneDrive.</strong> Syncing <code>node_modules</code>, virtual environments, datasets and <code>.git</code> through OneDrive causes file locks and slow syncs. Move <code>wildtriage/</code> to a folder OneDrive doesn't sync (e.g. <code>C:\dev\wildtriage</code> or the WSL2 ext4 filesystem), then run <code>git init</code>. Keep data under <code>D:\data</code> or WSL.</li>
+<li><strong>Request gated access on day 1:</strong> SAM 3 (<code>facebook/sam3</code>, <code>facebook/sam3.1</code>) and SA-FARI (<code>facebook/SA-FARI</code>) on Hugging Face.</li>
+<li><strong>Get the swap of Paper 3 approved</strong>, and confirm ECCV is on your approved venue list.</li>
+<li><strong>Check the lab PC on day 1.</strong> Ask IT before W2:
+   - Can you install software? Specifically Docker Desktop, WSL2, a portable PostgreSQL and the CUDA-enabled PyTorch wheels.
+   - Can jobs run overnight, and can you reach the PC remotely?
+   - Is the disk persistent, or is it re-imaged or wiped at logout?
+   - Is the GPU shared with other students?</li>
+</ol>
+<p>The skeleton runs <strong>natively on Windows without admin rights</strong> (uv + a portable PostgreSQL) and with Docker. Pick the path that matches the answers.
+5. <strong>Check the T1000 machine on day 1.</strong>
+   - Install the CUDA build of PyTorch.
+   - Confirm <code>torch.cuda.get_arch_list()</code> includes <code>sm_75</code> (Turing).
+   - Confirm <code>torch.cuda.is_bf16_supported()</code> is <code>False</code>. The code then falls back to fp16 automatically.
+6. <strong>Test the cloud fallback (molab) in W1.</strong> Create a free <a href="https://molab.marimo.io" target="_blank" rel="noopener">molab</a> account and run one SAM 3 clip there. Record peak VRAM, seconds per clip, whether files and installed packages survive between sessions, how Hugging Face tokens are handled, and any quota you hit. Do this <em>before</em> you need it (see §12, risk 16).
+7. <strong>Read the README</strong> in <code>wildtriage/</code> for how to run the skeleton.</p>
+<hr />
+<h2 id="1-executive-verdict">1. Executive verdict</h2>
+<p><strong>Feasible in 8 weeks for 2 people, but only with a focused scope.</strong> <span class="chip chip-rec" title="Recommendation">R</span></p>
+<p><strong>What to build: a self-hosted camera-trap triage and verification platform</strong> (working name <em>WildTriage</em>). It turns raw camera-trap images and videos into verified species records. Its main claim is measured: <em>how much human review it saves at a controlled error rate</em>.</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fully supported, evaluated (P0)</strong></td>
+<td>Camera-trap <strong>images and videos</strong>.<br>Detection (MegaDetector).<br>Species identification (BioCLIP 2, with per-site adaptation following Paper 3's recipe).<br>Video segmentation, tracking and per-clip counts (SAM 3, Paper 1's benchmark).<br>Calibrated confidence and a risk-controlled triage policy.<br>Human verification with an audit trail.<br>Activity summaries; CSV/COCO export.</td>
+</tr>
+<tr>
+<td><strong>Experimental (P1)</strong></td>
+<td>Camouflage refinement with DepthSAM (Paper 2).<br>Aerial <em>still-image</em> counting with MegaDetector-Overhead (OWL) or HerdNet on one public dataset.<br>An in-app site-adaptation loop.<br>Camtrap DP export and PDF/HTML reports.</td>
+</tr>
+<tr>
+<td><strong>Out of scope</strong> (future work)</td>
+<td>Aerial video tracking.<br>Individual re-identification.<br>Statistically valid population <strong>density/abundance</strong> estimation: REM, CTDS and SCR need deployment geometry, the camera's detection zone and animal movement data, none of which we have.<br>Edge/embedded deployment.<br>Multi-tenant SaaS.<br>Training any large model from scratch.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Research contribution (one, testable).</strong> <em>Review-budgeted, risk-controlled triage with site adaptation for camera-trap species recognition under temporal shift</em> (§3). It builds directly on Paper 3's open questions and Paper 1's video benchmark.</p>
+<p><strong>What we will not claim:</strong>
+- state-of-the-art results;
+- publication readiness;
+- production-grade reliability;
+- abundance estimates.</p>
+<hr />
+<h2 id="2-paper-validation">2. Paper validation</h2>
+<h3 id="21-comparison-table">2.1 Comparison table</h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th></th>
+<th><strong>P1: SA-FARI</strong></th>
+<th><strong>P2: DepthSAM ("Beyond Appearance")</strong></th>
+<th><strong>P3 (new): StreamTrap ("Lessons and Open Questions…")</strong></th>
+<th><em>P3 (dropped): Real-Wild-VLM</em></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Venue</strong> <span class="chip chip-verified" title="Verified">V</span></td>
+<td>CVPR 2026 <strong>main</strong>, oral (<a href="https://openaccess.thecvf.com/content/CVPR2026/html/Wasmuht_The_SA-FARI_Dataset_Segment_Anything_in_Footage_of_Animals_for_CVPR_2026_paper.html" target="_blank" rel="noopener">CVF</a>, <a href="https://cvpr.thecvf.com/virtual/2026/oral/40322" target="_blank" rel="noopener">oral listing</a>)</td>
+<td>CVPR 2026 <strong>main</strong>, poster, pp. 25830–25840 (<a href="https://openaccess.thecvf.com/content/CVPR2026/html/Han_Beyond_Appearance_Camouflaged_Object_Detection_via_Geometric_Structure_CVPR_2026_paper.html" target="_blank" rel="noopener">CVF</a>)</td>
+<td><strong>ECCV 2026 main</strong> (arXiv comment and <a href="https://jeonso0907.github.io/stream-trap/" target="_blank" rel="noopener">project page</a>; <a href="https://arxiv.org/abs/2603.20509" target="_blank" rel="noopener">arXiv 2603.20509</a>)</td>
+<td>CVPR 2026 <strong>Workshops</strong>: 5th DataCV Workshop, 6 pp. (<a href="https://openaccess.thecvf.com/content/CVPR2026W/DataCV/html/Deng_Real-Wild-VLM_Prompting_Large_Vision-Language_Models_for_Wildlife_Recognition_in_Camera-Trap_CVPRW_2026_paper.html" target="_blank" rel="noopener">CVF</a>)</td>
+</tr>
+<tr>
+<td><strong>Authors</strong></td>
+<td>Wasmuht, Brookes, … Saenko, Surís (Conservation X Labs, Meta, Bristol et al.)</td>
+<td>Han, Wu, Sun, Tang</td>
+<td>Jeon, Tian, Wang, … Chao</td>
+<td>Deng, Song, Bao, Ge</td>
+</tr>
+<tr>
+<td><strong>Task</strong></td>
+<td>Multi-animal detection, segmentation, tracking and species ID in camera-trap <strong>video</strong> (promptable concept segmentation)</td>
+<td>Camouflaged object detection (class-agnostic binary segmentation, single image)</td>
+<td>Camera-trap <strong>species classification over time</strong>, per site, under temporal shift</td>
+<td>Zero-shot large-VLM recognition, including empty-clip rejection, on infrared camera-trap video</td>
+</tr>
+<tr>
+<td><strong>Core contribution</strong> <span class="chip chip-verified" title="Verified">V</span></td>
+<td>A dataset: 11,609 videos, 99 species, 741 locations, 16,224 masklets, 942,702 boxes/masks.<br>SAM 3 benchmarks.</td>
+<td>DepthSAM: a monocular-depth model adapted to camouflage via a sparse mixture-of-experts adapter (SMEA) and a geometric-semantic fusion module (GSFM).<br>Reported SOTA on COD10K (+3.0% S-α, +4.3% weighted-F over the prior best).</td>
+<td>A benchmark of 546 LILA camera traps evaluated chronologically.<br>Shows BioCLIP 2 zero-shot fails at many sites and naive updates can hurt.<br>Recipe: LoRA + Balanced Softmax, plus logit calibration and WiSE weight interpolation.</td>
+<td>Benchmark plus prompt engineering: explicit empty-rejection rules and morphology-guided instructions.</td>
+</tr>
+<tr>
+<td><strong>Data</strong> <span class="chip chip-verified" title="Verified">V</span></td>
+<td>Train: 10,776 videos, 650 locations.<br>Test: 833 videos, 91 locations; cameras disjoint from train.<br>Annotated at 6 fps; RLE masks in a YTVIS/SA-Co format.</td>
+<td>Standard COD benchmarks (COD10K, CAMO, NC4K, CHAMELEON).</td>
+<td>17 LILA datasets, about 3.2M images.</td>
+<td>Private infrared videos from NE China, per the CamAgent paper by the same authors (<a href="https://arxiv.org/html/2609.39112" target="_blank" rel="noopener">arXiv 2609.39112</a>).</td>
+</tr>
+<tr>
+<td><strong>Code / weights</strong> <span class="chip chip-verified" title="Verified">V</span></td>
+<td>Data: <a href="https://huggingface.co/datasets/facebook/SA-FARI" target="_blank" rel="noopener">HF <code>facebook/SA-FARI</code></a> (gated; frames and videos in GCS bucket <code>cxl-public-camera-trap</code>).<br>Evaluator: <a href="https://github.com/facebookresearch/sam3/tree/main/scripts/eval/veval" target="_blank" rel="noopener"><code>sam3/scripts/eval/veval</code></a>.<br>Model: <a href="https://github.com/facebookresearch/sam3" target="_blank" rel="noopener">SAM 3 / 3.1</a> (HF <code>facebook/sam3</code>, <code>facebook/sam3.1</code>, gated; 848M params).<br>No SA-FARI-fine-tuned checkpoint found.</td>
+<td><a href="https://github.com/hjy0518/DepthSAM" target="_blank" rel="noopener">hjy0518/DepthSAM</a>: README cites the paper, so it appears official (not confirmed). Code is Apache-2.0; weights and prediction maps on Google Drive/Baidu.<br>An independent <a href="https://github.com/Lxlorange/Jittor-DepthSAM" target="_blank" rel="noopener">Jittor port</a> reproduces close MAE values.</td>
+<td>Code and data both marked <strong>"Coming Soon"</strong>.<br>The method is re-implementable: BioCLIP 2 (<a href="https://huggingface.co/imageomics/bioclip-2" target="_blank" rel="noopener">HF</a>, MIT) and LILA data are public.</td>
+<td><strong>None found</strong> (no code, data, arXiv or supplement).<br>I could not read the PDF automatically: CVF blocks fetching it, and the browser tried to download it.</td>
+</tr>
+<tr>
+<td><strong>License</strong> <span class="chip chip-verified" title="Verified">V</span></td>
+<td>SA-FARI: <strong>CC-BY-NC 4.0</strong> (non-commercial).<br>SAM 3: "SAM License" (royalty-free; trade-control and acceptable-use limits).</td>
+<td>Code: Apache-2.0.<br><strong>Depends on Depth-Anything-V2-Large, which is CC-BY-NC-4.0</strong> (<a href="https://github.com/DepthAnything/Depth-Anything-V2" target="_blank" rel="noopener">DA-V2</a>); DA-V2-Small is Apache-2.0.</td>
+<td>Paper: arXiv license.<br>BioCLIP 2: MIT.<br>LILA licenses vary by dataset <span class="chip chip-assume" title="Assumption">A</span>.</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td><strong>Compute</strong></td>
+<td>SAM 3 inference in bf16 on the 20 GB RTX 4000 Ada [A: measure peak VRAM and fps in W1; split long clips into chunks if needed].<br>Fine-tuning is out of scope.</td>
+<td>Training uses 4 GPUs (<code>torchrun --nproc_per_node=4</code>); inference on 1 GPU.</td>
+<td>Embeddings plus LoRA or linear heads: fits easily on 1 GPU.</td>
+<td>7–8B VLM per clip: slow.</td>
+</tr>
+<tr>
+<td><strong>Relevance</strong></td>
+<td><strong>Direct</strong>: the core video module and video benchmark.</td>
+<td><strong>Complementary</strong>: COD benchmarks are mostly animals, but there is no species ID, no camera-trap evaluation and no video.</td>
+<td><strong>Direct</strong>: species classification, deployment over time, and calibration.</td>
+<td>Direct for night/empty clips, but the venue is ineligible and nothing is reproducible from released code.</td>
+</tr>
+<tr>
+<td><strong>Key limitations</strong></td>
+<td>NC license.<br>Weak on small masks: cgF1 25.3 vs 63.4 for large masks.<br>Only 4 continents.<br><strong>The public SAM 3 may already include SA-FARI train data</strong>: the paper's "SAM 3 (SA-FARI)" variant was trained with it <span class="chip chip-open" title="Unresolved">U</span>, so never evaluate SAM 3 on SA-FARI train.</td>
+<td>Single-image only.<br>Not promptable.<br>NC dependency.<br>Repo has no pinned requirements.<br>Training code for a related part (CORAL) is "after publication".</td>
+<td>No released code or benchmark yet: we must rebuild a smaller version ("StreamTrap-mini").<br>BioCLIP 2's pretraining may overlap LILA images <span class="chip chip-assume" title="Assumption">A</span>.</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Integration</strong></td>
+<td>Video expert (SAM 3) plus the SA-FARI test set for evaluation.</td>
+<td>Optional "refine mask" expert on hard crops (P1); evaluated offline.</td>
+<td>Classifier adaptation and calibration core; drives the research contribution.</td>
+<td>Its prompting recipe stays as a cited <strong>P2</strong> VLM expert.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Paper 1 benchmark numbers to reproduce</strong> <span class="chip chip-verified" title="Verified">V</span> (SA-FARI test set; Tables 3–5 re-read from the arXiv HTML on 18 Oct 2026. The HTML flattens the tables, so confirm the column grouping against the PDF in W1):
+- <strong>Species prompts</strong> (cgF1 / pHOTA / TETA):</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>cgF1</th>
+<th>pHOTA</th>
+<th>TETA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SAM 3</td>
+<td>14.0</td>
+<td>48.5</td>
+<td>39.6</td>
+</tr>
+<tr>
+<td>SAM 3 (SA-FARI)</td>
+<td>39.0</td>
+<td>63.1</td>
+<td>52.1</td>
+</tr>
+<tr>
+<td>SAM 3 FT</td>
+<td>46.9</td>
+<td>68.1</td>
+<td>58.7</td>
+</tr>
+<tr>
+<td>LLMDet + SAM 3 tracker</td>
+<td>2.6</td>
+<td>41.3</td>
+<td>30.4</td>
+</tr>
+<tr>
+<td>GLEE</td>
+<td>−0.2</td>
+<td>7.5</td>
+<td>22.0</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>"animal" prompt</strong> (IDF1 / HOTA):</li>
+</ul>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>IDF1</th>
+<th>HOTA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MegaDetector + ByteTrack</td>
+<td>38.6</td>
+<td>39.5</td>
+</tr>
+<tr>
+<td>MegaDetector + OC-SORT</td>
+<td>33.9</td>
+<td>45.5</td>
+</tr>
+<tr>
+<td>MegaDetector + BoostSort++</td>
+<td>47.2</td>
+<td>38.3</td>
+</tr>
+<tr>
+<td>SAM 3 (SA-FARI)</td>
+<td>71.1</td>
+<td>64.4</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Test subsets</strong> (Table 5, SAM 3 FT, cgF1): large masks 63.4, small masks 25.3, multiple animals 45.9, challenging 36.8, night 44.1, all 46.9.</li>
+<li><strong>Night subset:</strong> the paper says it "includes all the videos recorded at night" and reports it on the test split, so it most likely means 598 of the 833 test videos [V, one reading of the HTML; confirm in the PDF]. My first reading (5% of all videos) was probably wrong.</li>
+</ul>
+<h3 id="22-can-they-integrate">2.2 Can they integrate?</h3>
+<p><strong>Yes, as a cascade of experts around a calibrated triage policy</strong> <span class="chip chip-rec" title="Recommendation">R</span>:
+- The cheap path (MegaDetector, then BioCLIP 2) handles most media.
+- SAM 3 handles video clips that contain animals.
+- DepthSAM is an optional refiner for low-confidence, small or camouflaged detections.
+- The triage policy decides <strong>auto-accept / review / empty</strong> for each item.</p>
+<p>The papers are not merged into one model. Each is a module with a typed adapter interface (§11).</p>
+<h3 id="23-gaps-in-the-selection-and-how-we-fill-them-with-reusable-non-2026-tools-these-do-not-count-toward-the-three-papers">2.3 Gaps in the selection and how we fill them (with reusable, non-2026 tools; these do not count toward the three papers)</h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Gap</th>
+<th>Fill with</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Image detection</td>
+<td><a href="https://github.com/agentmorris/MegaDetector" target="_blank" rel="noopener">MegaDetector</a>: <code>pip install megadetector</code>; MDv1000-redwood recommended for accuracy, or MDv5a</td>
+<td><span class="chip chip-verified" title="Verified">V</span> repo MIT. Per-weight licenses not stated; MDv5 is YOLOv5-based, and YOLOv5 code is AGPL <span class="chip chip-assume" title="Assumption">A</span>.</td>
+</tr>
+<tr>
+<td>Species ID (supervised reference)</td>
+<td><a href="https://github.com/google/cameratrapai" target="_blank" rel="noopener">SpeciesNet</a>: 2,000+ labels, EfficientNetV2-M, geofencing</td>
+<td><span class="chip chip-verified" title="Verified">V</span> repo Apache-2.0. Trained on 65M images <em>including public LILA data</em>, so it is <strong>not zero-shot on LILA</strong>.</td>
+</tr>
+<tr>
+<td>Aerial imagery (<strong>none of the 3 papers</strong>)</td>
+<td><a href="https://github.com/microsoft/MegaDetector-Overhead" target="_blank" rel="noopener">MegaDetector-Overhead / OWL</a> (point-based; OWL-C/T/D; legacy HerdNet), <a href="https://github.com/microsoft/Pytorch-Wildlife" target="_blank" rel="noopener">Pytorch-Wildlife</a></td>
+<td><span class="chip chip-verified" title="Verified">V</span> code MIT; <strong>model/data release CC BY-NC-SA 4.0</strong></td>
+</tr>
+<tr>
+<td>Aerial data</td>
+<td>LILA: Izembek Lagoon Waterfowl (9,267 images, 521,270 boxes), NOAA Arctic Seals 2019 (~80k RGB+thermal, ~28k boxes).<br>Delplanque et al. multispecies (DOI 10.58119/ULG/MIRUU5).<br><a href="https://github.com/xiaohuicui/WAID" target="_blank" rel="noopener">WAID</a> (~14k images, 6 species).<br>MMLA (<a href="https://arxiv.org/abs/2504.07744" target="_blank" rel="noopener">arXiv 2504.07744</a>)</td>
+<td><span class="chip chip-verified" title="Verified">V</span> the LILA listing; Delplanque license <span class="chip chip-open" title="Unresolved">U</span> (ULiège server refused the connection; an HF mirror says CC-BY-NC-SA); WAID has no license file <span class="chip chip-open" title="Unresolved">U</span></td>
+</tr>
+<tr>
+<td>Tracking</td>
+<td>SAM 3 tracker (P1 paper) plus ByteTrack baseline via <code>supervision</code> (MIT)</td>
+<td><span class="chip chip-verified" title="Verified">V</span> SA-FARI baselines</td>
+</tr>
+<tr>
+<td>Population / activity</td>
+<td>Our code: independent events (30-min rule), relative abundance index (RAI) per 100 trap-days, diel activity, per-clip MaxN</td>
+<td>Standard camera-trap ecology; <em>not</em> density estimation</td>
+</tr>
+<tr>
+<td>Interchange standard</td>
+<td><a href="https://camtrap-dp.tdwg.org/" target="_blank" rel="noopener">Camtrap DP</a> (TDWG; deployments/media/observations; GBIF-publishable)</td>
+<td><span class="chip chip-verified" title="Verified">V</span></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Other CVPR 2026 main-conference papers found</strong> (I scanned all 4,042 titles by keyword; these are backup candidates only):
+- Discover-Segment-Select, zero-shot camouflage (<a href="https://arxiv.org/abs/2602.19944" target="_blank" rel="noopener">arXiv 2602.19944</a>): DINOv2 + SAM 2-L + Qwen2.5-VL-7B; about 42 s per image on an RTX 3090; no code found.
+- SDDF, open-vocabulary COD (<a href="https://arxiv.org/abs/2603.26109" target="_blank" rel="noopener">arXiv 2603.26109</a>).
+- ProM3E (ecology embeddings).
+- EthoCLIP (animal behaviour).
+- RealBirdID.
+- CountGD++ (open-world counting).
+- Thermal-Det.
+- A UAV multi-object-tracking benchmark ("Breaking Smooth-Motion Assumptions").</p>
+<p>I found <strong>no CVPR 2026 main-conference paper on aerial wildlife detection</strong> in the title scan.</p>
+<h3 id="24-final-recommendation-on-papers">2.4 Final recommendation on papers</h3>
+<ul>
+<li><strong>Keep P1 (SA-FARI)</strong> as the anchor.</li>
+<li><strong>Keep P2 (DepthSAM)</strong>, framed honestly as a <em>complementary robustness module</em>.</li>
+<li><strong>Swap P3 to the ECCV 2026 StreamTrap paper</strong> (your decision).</li>
+<li>Cite Real-Wild-VLM as related work and as a P2 technique.</li>
+<li><strong class="chipwrap"><span class="chip chip-open" title="Unresolved">U</span> Get instructor approval for the swap in W1.</strong> Confirm ECCV is on your approved list.</li>
+</ul>
+<h3 id="25-how-much-of-each-paper-was-actually-read">2.5 How much of each paper was actually read</h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>What I read</th>
+<th>What I did not</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SA-FARI</td>
+<td>arXiv HTML text and Tables 3–5, dataset card, project page, SAM 3 repo and license</td>
+<td>The PDF itself; the supplementary material; the SA-FARI dataset files</td>
+</tr>
+<tr>
+<td>DepthSAM</td>
+<td>CVF abstract page, the official-looking GitHub README, an independent Jittor port's README</td>
+<td>The PDF (CVF blocks fetching); no arXiv version found; the code was not run</td>
+</tr>
+<tr>
+<td>StreamTrap (ECCV)</td>
+<td>arXiv abstract and HTML text including limitations and open questions</td>
+<td>Appendix details; no code or benchmark is released yet</td>
+</tr>
+<tr>
+<td>Real-Wild-VLM (dropped)</td>
+<td>Abstract; the authors' CamAgent paper's citation of it</td>
+<td>The PDF (blocked)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Everything marked <span class="chip chip-verified" title="Verified">V</span> in this plan means "seen on the linked page", not "reproduced". Reproduction happens in W2–W5.</p>
+<hr />
+<h2 id="3-research-direction-and-novelty">3. Research direction and novelty</h2>
+<h3 id="31-directions-considered">3.1 Directions considered</h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Direction</th>
+<th>Gap evidence</th>
+<th>2-month feasibility (2 people, 1 GPU)</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Review-budgeted, risk-controlled triage + site adaptation under temporal shift</strong></td>
+<td>StreamTrap: zero-shot fails at many sites; naive updates underperform zero-shot at about 40% of traps. It calls predicting <em>when</em> adaptation helps "largely unexplored": its own confidence-based adapt-or-skip heuristics reach 76–77% balanced accuracy, against 87.8% for the oracle.<br>Related human-in-the-loop work routes by fixed confidence thresholds (see §3.3).</td>
+<td><strong>High.</strong> Works on cached embeddings; cheap training; public data.</td>
+<td><strong>Chosen (P0)</strong></td>
+</tr>
+<tr>
+<td>B. Calibrated routing between cheap and expensive <em>video</em> experts (MegaDetector + tracker vs SAM 3)</td>
+<td>SA-FARI: SAM 3 far stronger than MegaDetector + trackers, but costly.</td>
+<td>Medium: needs SAM 3 runs on the whole test set; SA-FARI test videos all contain animals, which limits the "skip" savings.</td>
+<td>P1 extension (Exp 2b)</td>
+</tr>
+<tr>
+<td>C. Camouflage-aware mask refinement</td>
+<td>DepthSAM is not evaluated on camera traps; SA-FARI small/challenging subsets are weak.</td>
+<td>Medium-low: DepthSAM is whole-image and not promptable, so applying it to crops is our adaptation.</td>
+<td>P1 offline experiment</td>
+</tr>
+<tr>
+<td>D. VLM empty-clip rejection (Real-Wild-VLM recipe)</td>
+<td>The workshop paper reports VLMs biased toward non-empty answers.</td>
+<td>Low: slow; needs empty-heavy labelled video.</td>
+<td>P2</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="32-the-chosen-contribution-a">3.2 The chosen contribution (A)</h3>
+<p><strong>Problem.</strong> A camera-trap deployment produces a stream of images. At each interval, an ecologist can review only a budget <em>b</em> of items. All other predictions are either auto-accepted or left unverified.</p>
+<p><strong>What we propose and evaluate</strong> <span class="chip chip-rec" title="Recommendation">R</span>. A triage loop with four parts:
+1. <strong>Calibrated confidence.</strong> Temperature scaling, fitted only on labels already reviewed at that site.
+2. <strong>Risk-controlled auto-acceptance.</strong>
+   - Split-conformal / conformal-risk-control thresholds that target error ≤ α among auto-accepted items.
+   - <strong>Adaptive conformal inference (ACI)</strong> variants that track α online under temporal shift.
+   - Conditioning by <strong>day vs night/IR</strong> ("Mondrian" groups), which ties to the lighting requirement.
+3. <strong>Budgeted review selection.</strong> Uncertainty × class-balance quotas: review the items most likely to be wrong, with minority species protected.
+4. <strong>Site adaptation from verified labels.</strong> StreamTrap recipe: Balanced Softmax with a linear head (or LoRA on BioCLIP 2), plus WiSE interpolation to protect zero-shot behaviour.</p>
+<p><strong>What is and is not new</strong> [R, after the related-work search in §3.3]. Every ingredient is existing work: temperature scaling, conformal risk control, Learn-then-Test, adaptive conformal inference, uncertainty-based and class-balanced selection, Balanced Softmax, WiSE. <strong>We do not claim a new method.</strong> What we propose is the <em>combination, evaluated under realistic conditions</em>:
+- chronological streams at many real camera sites (StreamTrap-style), not a single i.i.d. split;
+- a fixed review budget that is split between certification (random labels) and learning (selected labels);
+- whether the auto-accept error target holds on <em>future</em> intervals, with day and night treated separately;
+- how many selected labels close the gap to the all-labels oracle that StreamTrap uses.</p>
+<p>The honest framing is an <strong>empirical study with negative results allowed</strong>. Whether it is publishable depends on results and on the literature check below.</p>
+<p><strong>Novelty status</strong> <span class="chip chip-open" title="Unresolved">U</span>. In about ten searches I found no camera-trap paper that sets review thresholds with a finite-sample guarantee (conformal risk control or Learn-then-Test). Absence from a few searches is not proof; W1 repeats the search properly (arXiv, Google Scholar, Semantic Scholar, ecology journals) and the claim stays unmade until then.</p>
+<p><strong>Feasibility.</strong> BioCLIP 2 embeddings for about 200k crops take minutes to roughly an hour on the RTX 4000 Ada <span class="chip chip-assume" title="Assumption">A</span>. Linear heads take seconds and LoRA takes hours. Every policy is simulated over the cached predictions.</p>
+<p><strong>Data: "StreamTrap-mini".</strong> Rebuilt from LILA following the StreamTrap protocol:
+- Sites with ≥6 months and ≥1,000 animal images.
+- Crops from <strong>LILA's precomputed MegaDetector results</strong> (<span class="chip chip-verified" title="Verified">V</span> MDv5a/b, MDv1000-redwood, and repeat-detection-eliminated versions), with boxes enlarged by 50%.
+- Chronological monthly intervals.
+- Target <strong>30 sites</strong>: 10 dev and 20 test, from ≥3 LILA datasets.</p>
+<p><strong>Design input from the simulator</strong> (synthetic data, checks the mechanics only; <em>not a result</em>). <code>research/experiments/exp1_triage.py --synthetic</code> shows that <strong>the size of the random calibration slice decides whether anything can be auto-accepted.</strong>
+- With α = 5% and δ = 0.1, Learn-then-Test needs at least ln δ / ln(1 − α) ≈ <strong>45 error-free accepted calibration labels per group</strong> before it can certify a threshold.
+- Splitting calibration by day/night therefore costs coverage: 4% vs 12% in the smoke run.
+- Exp 1 must therefore vary the calibration fraction ({0.2, 0.3, 0.5}). It must also test <strong>pooling calibration across sites</strong> against per-site calibration (pooling assumes sites are exchangeable).</p>
+<p><strong>Academic value:</strong> a clear empirical study with guarantees-vs-reality analysis and negative results allowed.</p>
+<p><strong>Commercial value:</strong> the headline product metric, "% of images auto-accepted at ≤α error" and "labels needed per site".</p>
+<p><strong>Secondary (P0 reproduction, P1 analysis):</strong>
+- <strong>Exp 2: SA-FARI video counting.</strong> SAM 3 vs MegaDetector + ByteTrack per-clip MaxN error, by subset (night, small, multi-animal, challenging).
+- <strong>Exp 2b (P1):</strong> clip-level routing (direction B).
+- <strong>Exp 3 (P1):</strong> DepthSAM reproduction plus hard-crop refinement.
+- <strong>Exp 4 (P1):</strong> aerial counting with OWL/HerdNet.</p>
+<h3 id="33-related-work-found-searched-18-oct-2026">3.3 Related work found (searched 18 Oct 2026)</h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Work</th>
+<th>What it does</th>
+<th>How it relates</th>
+<th>Read how</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dussert et al., <em>Being confident in confidence scores</em> (Remote Sensing in Ecology and Conservation 2025; <a href="https://www.biorxiv.org/content/10.1101/2023.11.10.566512" target="_blank" rel="noopener">bioRxiv</a>)</td>
+<td>Calibration of camera-trap classifiers at image and sequence level. Averaging <strong>logits</strong> over a sequence before the softmax was the most effective; temperature scaling suggested.</td>
+<td>Direct baseline for our calibration and sequence aggregation. <strong>Changed our code</strong> (see below).</td>
+<td>Search summary only; the page blocked fetching</td>
+</tr>
+<tr>
+<td>Huebner et al. 2024, <a href="https://theoryandpractice.citizenscienceassociation.org/articles/10.5334/cstp.752" target="_blank" rel="noopener"><em>Human supervision is key…</em></a> (Snapshot Safari)</td>
+<td>Human-in-the-loop with confidence-based routing: error 34.89% (AI alone) vs 8.73% (with volunteers) on a 5,314-point Serengeti gold standard.</td>
+<td>The closest <em>deployed</em> version of confidence routing. Heuristic thresholds, no guarantee, one site and one time window.</td>
+<td>Page read</td>
+</tr>
+<tr>
+<td>Norouzzadeh et al. 2021, <a href="https://arxiv.org/html/1910.09716v1" target="_blank" rel="noopener">deep active learning</a> (Methods in Ecology and Evolution)</td>
+<td>Active selection of images to label; reports matching full-label accuracy on a 3.2M-image set with 14,100 labels (&gt;99.5% fewer).</td>
+<td>Baseline for our selection strategies. Single dataset.</td>
+<td>Search summary</td>
+</tr>
+<tr>
+<td>Miao et al. 2021, <a href="https://www.nature.com/articles/s42256-021-00393-0" target="_blank" rel="noopener">iterative human + automated identification</a> (Nature Machine Intelligence)</td>
+<td>Model picks low-confidence items for humans, accepts the rest.</td>
+<td>Same idea without risk control.</td>
+<td>Search summary</td>
+</tr>
+<tr>
+<td>Fermanian, Hebiri, Salmon, <a href="https://arxiv.org/abs/2507.07150" target="_blank" rel="noopener">class-conditional conformal prediction for multiple inputs</a> (NeurIPS 2025)</td>
+<td>Conformal sets that combine several photos of the same individual, with class-conditional coverage. Evaluated on Pl@ntNet (plants).</td>
+<td>Directly relevant to bursts and sequences. A <strong>P2 baseline</strong> for our sequence handling.</td>
+<td>Abstract</td>
+</tr>
+<tr>
+<td>Cohen et al. 2026, <a href="https://arxiv.org/abs/2605.13660" target="_blank" rel="noopener">Bayesian fusion of AI confidences and manual annotations</a> (stat.AP preprint)</td>
+<td>Calibrates AI confidences with annotations for ecological inference (deer body condition). Annotations chosen <em>at random</em>; active selection is named as future work.</td>
+<td>Shows the "which images to annotate" question is open in ecology statistics. Different task.</td>
+<td>Abstract + most of the text</td>
+</tr>
+<tr>
+<td>StreamTrap, <a href="https://arxiv.org/abs/2603.20509" target="_blank" rel="noopener">arXiv 2603.20509</a> (ECCV 2026)</td>
+<td>Adapt-or-skip heuristics (random, mean max-softmax, feature prototypes) reach 77.4 / 75.9 / 76.4% balanced accuracy vs 87.8% oracle; images treated as independent (no sequence modelling).</td>
+<td>Our baseline and the open question we address. <strong>We must differentiate from its MSP heuristic.</strong></td>
+<td>Text read, last section partly</td>
+</tr>
+<tr>
+<td>Hockerts et al. 2026, <a href="https://arxiv.org/abs/2608.30789" target="_blank" rel="noopener">label uncertainty</a></td>
+<td>Effect of volunteer-label noise on classifiers. No conformal or calibration component.</td>
+<td>Context for reviewer noise (our ablation of 0% vs 2%).</td>
+<td>Page read</td>
+</tr>
+<tr>
+<td>Conformal prediction for acoustic indices, <a href="https://www.sciencedirect.com/science/article/pii/S266597272600276X" target="_blank" rel="noopener">ScienceDirect 2026</a>; Poisot, species distribution models (<a href="https://ecoevorxiv.org/repository/object/8041/download/15118/" target="_blank" rel="noopener">EcoEvoRxiv</a>)</td>
+<td>Conformal methods applied to other ecological monitoring data.</td>
+<td>Shows conformal methods are entering ecology; none for camera-trap review.</td>
+<td>Titles and snippets only (page blocked)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>What changed in the project because of this search:</strong>
+1. <strong>Sequence aggregation</strong> now defaults to averaging <strong>logits</strong> before the softmax (Dussert et al.), with probability-mean and max kept as ablations. <code>ml/wildtriage_ml/pipeline/aggregate.py</code> was updated and tested.
+2. <strong>The novelty claim is now modest</strong> (see above): a combination and an evaluation, not a new method.
+3. <strong>StreamTrap's MSP adapt-or-skip rule is an explicit baseline</strong> in Exp 1, besides random and least-confidence review.
+4. <strong>Conformal sets for bursts</strong> (Fermanian et al.) are a P2 baseline, not P0.
+5. <strong>Cite:</strong> Dussert 2025, Huebner 2024, Norouzzadeh 2021, Miao 2021, Angelopoulos et al. (conformal risk control; Learn-then-Test), Gibbs and Candès (ACI), Ren et al. (Balanced Softmax), Wortsman et al. (WiSE-FT).</p>
+<hr />
+<h2 id="4-product-specification">4. Product specification</h2>
+<p><strong>Target users:</strong>
+- conservation NGOs and protected-area teams running camera-trap grids;
+- university ecology labs;
+- environmental consultancies doing biodiversity monitoring for impact assessments [A: market hypothesis].</p>
+<p><strong>Problem.</strong> Manual review of camera-trap media is the bottleneck. Generic AI labels have unknown, site-dependent error and give no indication of which labels to trust.</p>
+<p><strong>Core workflows:</strong>
+1. Create a project with a region and species list.
+2. Register deployments (sites/cameras and their dates).
+3. Upload a card dump (folder or zip of images/videos).
+4. Processing runs asynchronously with live progress.
+5. The system triages each item: auto-accept, review queue or empty.
+6. Reviewers verify the queue by keyboard.
+7. <em>(P1)</em> Adapt the site model from verified labels and re-triage.
+8. Analytics and export (CSV, COCO, Camtrap DP P1).</p>
+<p><strong>Supported inputs</strong> (P0 unless marked):</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Images</td>
+<td>JPG/PNG; EXIF timestamp.</td>
+</tr>
+<tr>
+<td>Videos</td>
+<td>MP4/MOV/AVI (H.264/H.265 via ffmpeg); ≤10 min and ≤2 GB each (configurable).</td>
+</tr>
+<tr>
+<td>Aerial stills</td>
+<td>JPG/TIFF ≤ 100 MP (P1), tiled.</td>
+</tr>
+<tr>
+<td>Annotation import</td>
+<td>COCO / COCO-Camera-Traps JSON, the MegaDetector batch JSON, SA-FARI (YTVIS-like) JSON, CSV species lists.</td>
+</tr>
+<tr>
+<td>Modality</td>
+<td><strong>Declared per dataset</strong> (camera_trap | aerial); no automatic modality detection (P2).</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Feature status:</strong></p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Implemented (P0)</strong></td>
+<td>Ingest, validation and SHA-256 dedup.<br>Quality flags (night/IR, blur, darkness).<br>MegaDetector; BioCLIP 2 species top-5 with calibrated confidence.<br>Sequence/clip aggregation.<br>SAM 3 video masklets/tracks and MaxN.<br>Triage policy; review queue; audit log.<br>Analytics (counts, diel activity, detections per deployment); CSV/COCO export.<br>Model and evaluation registry.</td>
+</tr>
+<tr>
+<td><strong>Experimental (P1)</strong></td>
+<td>DepthSAM refine; aerial counting; site-adaptation loop; Camtrap DP; RAI/independent events; reports; perceptual-hash near-duplicate detection.</td>
+</tr>
+<tr>
+<td><strong>Future (P2)</strong></td>
+<td>VLM adjudication, aerial video, re-ID, density estimation, edge, OCR timestamps, map/PostGIS, SaaS.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Handling bad or uncertain inputs:</strong>
+- <strong>Unsupported or corrupt files</strong> are rejected per file with error codes (<code>UNSUPPORTED_TYPE</code>, <code>DECODE_FAILED</code>, <code>TOO_LARGE</code>, <code>DUPLICATE</code>).
+- <strong>Low-quality media is never auto-accepted.</strong> Low-quality means very dark, blurred, or with a tiny bounding box.
+- <strong>Low confidence or disagreement between models</strong> sends the item to review, with explicit reason codes.
+- <strong>Humans detected:</strong> frames flagged; blurred in exports; hidden from viewers.
+- <strong>Endangered-species coordinates</strong> are obfuscated (rounded) except for admins.</p>
+<h3 id="4b-market-licensing-and-commercial-readiness">4b. Market, licensing and commercial readiness</h3>
+<p><strong>Competing tools</strong> (checked 18 Oct 2026 against the sources linked; "not verified" means not on the pages I read, not proof of absence):</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>What it is</th>
+<th>What I verified</th>
+<th>Not verified</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://www.worldwildlife.org/our-work/wildlife/wildlife-technology/wildlife-insights/" target="_blank" rel="noopener">Wildlife Insights</a></td>
+<td>Hosted platform; AI sorts uploads into people, animals, empty, then species with SpeciesNet</td>
+<td>Human review is built in (accept the AI label or pick from a list, thumbnail identification, burst mode); about 200 million human-verified images reported; access is free but gated, with approval needed for non-commercial users with fewer than 50 cameras (<a href="https://research.google/blog/where-wild-things-roam-identifying-wildlife-with-speciesnet/" target="_blank" rel="noopener">Google Research</a>, <a href="https://wildlabs.net/en/inventory/products/wildlife-insights" target="_blank" rel="noopener">WildLabs</a>)</td>
+<td>Video support; whether it uses calibrated or risk-controlled thresholds</td>
+</tr>
+<tr>
+<td><a href="https://github.com/PetervanLunteren/AddaxAI" target="_blank" rel="noopener">AddaxAI</a> (formerly EcoAssist)</td>
+<td>Desktop app: detection, species recognition, verification, dashboards, exports</td>
+<td>Open source, MIT, Windows/macOS/Linux; docs list "Confidence and verification", "Check the labels" and Timelapse-export pages</td>
+<td>Video; export formats; calibration</td>
+</tr>
+<tr>
+<td>Timelapse</td>
+<td>Desktop image reviewer that shows MegaDetector and classifier output</td>
+<td>Human review with ML output (per <a href="https://agentmorris.github.io/camera-trap-ml-survey/" target="_blank" rel="noopener">Morris's survey</a>)</td>
+<td>Licensing; video</td>
+</tr>
+<tr>
+<td><a href="https://zamba.drivendata.org" target="_blank" rel="noopener">Zamba / Zamba Cloud</a></td>
+<td>Open-source package plus a no-code cloud service for <strong>video</strong> and image classification</td>
+<td>Video support; models for 32 African and 11 European species plus blanks; reported 82% top-1 (African) and 79% (European)</td>
+<td>Pricing; review workflow</td>
+</tr>
+<tr>
+<td>TrapTagger, Agouti, TRAPPER, Camelot, WildTrax</td>
+<td>Web or desktop platforms with MegaDetector-based filtering and annotation</td>
+<td>TrapTagger and TRAPPER are open source (per the survey)</td>
+<td>Features beyond one-line descriptions</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>What the competing tools do not appear to offer</strong> [R, from the pages above]: none of the pages I read describe <em>calibrated</em> confidence, <em>error-rate-controlled</em> auto-acceptance, or <em>per-site adaptation from verifications</em> as a measured feature. That is the gap our product bets on. It may exist in places I did not read, so the plan makes it a testable claim, not a marketing line.</p>
+<p><strong>Differentiation</strong> <span class="chip chip-rec" title="Recommendation">R</span>. Video-native segmentation and counting, <strong>calibrated, error-controlled triage with measured review savings</strong>, and per-site adaptation from verifications. All of it runs self-hosted on one GPU workstation, with no field data leaving the organization.</p>
+<p><strong>Honest limits of that pitch:</strong> Wildlife Insights is free for most research users and already has human review; AddaxAI is free, local and open source. A researcher will ask why they should switch. The answer has to be a measured saving in review time or error, not interface polish.</p>
+<p><strong>Deployment options:</strong>
+1. A self-hosted Docker Compose stack on a GPU workstation; works offline at field stations.
+2. A lab server.
+3. <em>(Later)</em> managed hosting.</p>
+<p><strong>Licensing split: two model manifests</strong> <span class="chip chip-rec" title="Recommendation">R</span>.
+- <strong>Research edition</strong> may use NC components: anything trained on SA-FARI, DA-V2-Large inside DepthSAM, and the OWL/HerdNet weights.
+- <strong>Commercial edition</strong> uses license-clean components only:
+  - BioCLIP 2 (MIT), SpeciesNet (Apache), DA-V2-Small, RF-DETR N/S/M/L (Apache);
+  - SAM 3 (SAM License: legal review needed);
+  - MegaDetector (weight/AGPL status <span class="chip chip-open" title="Unresolved">U</span>).
+- Every <code>model_versions</code> row stores its license; a license-check script blocks NC models when commercial mode is on.</p>
+<p><strong>Demonstrable benefit (only if Exp 1 shows it):</strong> "X% of items auto-accepted at ≤5% realized error; Y labels per site to reach within 2 points of oracle accuracy." Report confidence intervals and failure sites.</p>
+<p><strong>Not deliverable in 2 months:</strong> customer validation, a security audit, SLAs, a hosted service, or legal clearance of licenses.</p>
+<hr />
+<h2 id="5-system-architecture">5. System architecture</h2>
+<div class="scroll"><pre><code> Browser: React SPA (Projects · Data/Upload · Jobs · Media &amp; Clip viewer · Review · Analytics · Models/Eval · Export)
+        │  REST/JSON + SSE (job progress)                        ▲ signed media URLs
+        ▼                                                        │
+ ┌──────────────────────────────┐   files   ┌────────────────────┴─────┐
+ │ api: FastAPI                 │──────────▶│ Media store              │
+ │ auth/RBAC · validation ·     │           │ local volume (P0) behind │
+ │ CRUD · triage/review · audit │           │ StorageBackend; S3 (P1)  │
+ │ analytics · exports          │           └────────────▲─────────────┘
+ └──────┬───────────────────────┘                        │
+        │ SQLAlchemy (CRUD + INSERT job row = enqueue)    │
+ ┌──────▼──────────────────────┐   claim: SELECT … FOR UPDATE SKIP LOCKED
+ │ PostgreSQL 16               │◀──────────────┬───────────┴───────────────────────────┐
+ │ metadata · predictions ·    │               │                                        │
+ │ reviews · audit · evals ·   │  ┌────────────┴──────────────────┐  ┌─────────────────┴──────────────────┐
+ │ jobs table = the job queue  │  │ worker (queue &quot;cpu&quot;): ingest,  │  │ GPU workers, one process per GPU,  │
+ └─────────────────────────────┘  │ ffprobe/ffmpeg, thumbnails,    │  │ each with its own VRAM budget:     │
+                                  │ quality, dedup, exports        │  │ &quot;gpu&quot;: MegaDetector · BioCLIP 2    │
+                                  └────────────────────────────────┘  │   (+site head, calibrator) · Triage│
+                                                                      │   → lab PC or T1000 (fp16, 3.5 GB) │
+                                                                      │ &quot;gpu-heavy&quot;: SAM 3 video, [P1]     │
+                                                                      │   DepthSAM (own env), OWL/HerdNet  │
+                                                                      │   → lab PC only (bf16, 18 GB)      │
+                                                                      └────────────────────────────────────┘
+ Offline research workspace: same `ml/` package → data prep → cached embeddings → experiments
+                             → evaluation_runs rows (DB) + figures; git commit recorded per run
+</code></pre></div>
+<p><strong>Deployment shapes</strong> (same code):
+- <strong>(a) Native Windows on the lab PC.</strong> No admin rights needed: <code>uv</code> virtual environments, a portable PostgreSQL started with <code>pg_ctl</code>, the API and workers as plain processes, and the frontend served by Vite in development or as static files.
+- <strong>(b) Docker Compose</strong> on any machine that has Docker (your laptop has it). The GPU worker is optional (the <code>gpu</code> profile).</p>
+<p><strong>Machine roles at run time:</strong></p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Machine</th>
+<th>Runs</th>
+<th>Settings (<code>.env</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lab PC (demo host)</td>
+<td>Postgres, API, frontend, <code>cpu</code> worker, one GPU worker on <code>gpu,gpu-heavy</code></td>
+<td><code>WT_MODEL_BACKEND=real</code>, <code>WT_GPU_VRAM_BUDGET_GB=18</code></td>
+</tr>
+<tr>
+<td>T1000 PC</td>
+<td>A GPU worker on <code>gpu</code> only, pointed at the lab PC's database when on the campus network; otherwise its own local stack for development</td>
+<td><code>WT_MODEL_BACKEND=real</code>, <code>WT_GPU_VRAM_BUDGET_GB=3.5</code></td>
+</tr>
+<tr>
+<td>MacBook</td>
+<td>A GPU worker on <code>gpu</code> (MPS), or its own local stack for development</td>
+<td><code>WT_MODEL_BACKEND=real</code>, <code>WT_DEVICE=mps</code>, <code>WT_GPU_VRAM_BUDGET_GB=12</code></td>
+</tr>
+<tr>
+<td>Laptop</td>
+<td>The full stack in Docker or natively, using stub models</td>
+<td><code>WT_MODEL_BACKEND=stub</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Media files must be reachable by the worker that processes them. Remote workers therefore only run when they share storage with the API (same machine, or a network share). Otherwise each machine runs its own local stack. <span class="chip chip-rec" title="Recommendation">R</span> For the demo, run everything on the lab PC.</p>
+<h3 id="inference-pipeline-per-media-item">Inference pipeline (per media item)</h3>
+<ol>
+<li><strong>Validate.</strong> Check magic bytes; read metadata (EXIF, ffprobe); compute SHA-256 to catch duplicates; compute quality features:
+   - night/IR flag: low chroma, mean |R−G|+|G−B| below a threshold;
+   - blur: variance of the Laplacian;
+   - brightness.</li>
+<li><strong>Image path.</strong>
+   - Run MegaDetector (confidence ≥ τ_det).
+   - Crop each detection with the box enlarged 50%.
+   - Run BioCLIP 2 against the project's species prompts, or the site head if one exists.
+   - Apply temperature scaling.
+   - Aggregate over the camera's burst/sequence (LILA's <code>seq_id</code> or a time gap under 30 s).</li>
+<li><strong>Video path.</strong>
+   - Run MegaDetector on frames sampled at 1 fps. If there is no animal, mark the clip as an empty candidate (this saves GPU).
+   - Otherwise run SAM 3 at 6 fps (matches SA-FARI) with the prompt "animal" plus the top-k species names from the classifier.
+   - Output masklets → tracks → per-track species vote → <strong>MaxN</strong> (the most animals visible in any one frame).</li>
+<li><strong>Triage policy</strong> (versioned). Outputs:
+   - <code>auto_accept</code> / <code>review(priority, reasons[])</code> / <code>auto_empty</code>;
+   - α and the budget come from project settings.</li>
+<li><strong>Review</strong> writes <code>verification_decisions</code>, which are append-only and audited.</li>
+<li><strong>Adaptation</strong> (P1 in-app; P0 in research) creates a new <code>model_version</code> from verified labels, then re-triages.</li>
+</ol>
+<p><strong>Dependency isolation</strong> <span class="chip chip-rec" title="Recommendation">R</span>:
+- SAM 3 needs Python ≥3.12 and PyTorch ≥2.7 / CUDA ≥12.6 <span class="chip chip-verified" title="Verified">V</span>.
+- DepthSAM ships old SAM-v1 code with unpinned requirements <span class="chip chip-verified" title="Verified">V</span>.
+- So DepthSAM gets its <strong>own virtual environment (or image)</strong>, and a worker started only for <code>gpu-heavy</code> camouflage jobs.
+- If MegaDetector's dependencies conflict, it gets its own environment too. Each job row names its queue, and each worker claims only its own queues.</p>
+<p><strong>VRAM policy</strong> (20 GB lab PC, 4 GB T1000) <span class="chip chip-rec" title="Recommendation">R</span>:
+- Use <strong>bf16 where the GPU supports it</strong> (Ada); fall back to <strong>fp16</strong> (Turing T1000, which has no bf16) or fp32 on CPU. <code>wildtriage_ml.registry.pick_dtype</code> picks automatically.
+- Each GPU worker's <code>ModelRegistry</code> has a <strong>VRAM budget</strong> (18 GB on the lab PC, 3.5 GB on the T1000). It evicts the least-recently-used model before loading another, and refuses models that can never fit.
+- <strong>What fits on the T1000</strong> [A: measure in W1]: MegaDetector (about 1.5 GB) and BioCLIP 2 ViT-L/14 in fp16 (about 2 GB, small batches), one at a time if needed. SAM 3, DepthSAM and VLMs run on the lab PC only (<code>gpu-heavy</code>).
+- Small models stay resident: MegaDetector and BioCLIP 2 together are about 3 GB <span class="chip chip-assume" title="Assumption">A</span>.
+- SAM 3 loads on demand.
+- Run DepthSAM and any VLM <strong>only in their own job batches, never resident at the same time as SAM 3.</strong>
+- Split long videos into chunks of ≤ 30 s at 6 fps.
+- Log <code>torch.cuda.max_memory_allocated()</code> on every job, so the efficiency table comes for free.</p>
+<p><strong>Why a Postgres queue instead of Celery + Redis</strong> <span class="chip chip-rec" title="Recommendation">R</span>:
+- Redis has no official Windows build, and the lab PC may not allow Docker or WSL2.
+- Celery's Windows support is limited.
+- A <code>jobs</code> table claimed with <code>SELECT … FOR UPDATE SKIP LOCKED</code> removes a service. It also makes "create job + enqueue" a single transaction, and works natively and in Docker alike.
+- Volume is low: one GPU worker, thousands of jobs rather than millions.
+- If you later need more scale, the same interface can be backed by a Postgres task-queue library such as Procrastinate, or by Celery.</p>
+<hr />
+<h2 id="6-technology-stack">6. Technology stack</h2>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Choice</th>
+<th>Why</th>
+<th>Simpler alternative</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Backend</td>
+<td>Python 3.12, <strong>FastAPI</strong>, Pydantic v2, Uvicorn</td>
+<td>Same language as the ML code; async; OpenAPI generates the TypeScript client</td>
+<td>Flask</td>
+</tr>
+<tr>
+<td>ORM / migrations</td>
+<td>SQLAlchemy 2.0, Alembic</td>
+<td>Typed models; repeatable migrations</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Database</td>
+<td><strong>PostgreSQL 16</strong> (JSONB for model outputs and config)</td>
+<td>Concurrency with workers; JSONB; PostGIS later</td>
+<td>SQLite (single-user demos only)</td>
+</tr>
+<tr>
+<td>Jobs</td>
+<td><strong>Postgres-backed queue</strong> (<code>jobs</code> table + <code>FOR UPDATE SKIP LOCKED</code>, ~200 lines in <code>backend/app/workers/</code>): named queues, retries with backoff, heartbeat, progress columns; one long-lived GPU worker process loads models once and never forks CUDA</td>
+<td>No Redis; works natively on Windows and in Docker; enqueue is in the same transaction as the job row</td>
+<td>Procrastinate (Postgres-based) or Celery + Redis if scale demands it</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>Local volume behind a <code>StorageBackend</code> interface; S3-compatible adapter (boto3) in P1</td>
+<td>Zero infrastructure; swappable later</td>
+<td>— (<span class="chip chip-assume" title="Assumption">A</span> check MinIO's current community-edition status before adopting it)</td>
+</tr>
+<tr>
+<td>Media</td>
+<td>ffmpeg/ffprobe, PyAV, OpenCV, Pillow, pycocotools (RLE masks)</td>
+<td>Standard</td>
+<td>—</td>
+</tr>
+<tr>
+<td>ML</td>
+<td>PyTorch ≥2.7 (CUDA 12.6+), <code>megadetector</code>, <code>open_clip</code> (BioCLIP 2), <code>sam3</code>, <code>peft</code> (LoRA), scikit-learn, numpy/pandas/pyarrow</td>
+<td>Reuse first</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Evaluation</td>
+<td>pycocotools, TrackEval (HOTA/IDF1), the sam3 <code>veval</code> (cgF1/pHOTA/TETA), <code>py-sod-metrics</code> (S-α, F-β^w, E-φ, MAE), our own unit-tested ECE and conformal code</td>
+<td>Matches each paper's protocol</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Experiment tracking</td>
+<td>MLflow (local file store) + YAML configs + <code>evaluation_runs</code> table</td>
+<td>Free; offline</td>
+<td>CSV + git</td>
+</tr>
+<tr>
+<td>Data versioning</td>
+<td>Parquet manifests (path, sha256, site, timestamp, seq_id, split) committed to git; DVC optional</td>
+<td>Reproducible splits without heavy tooling</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Frontend</td>
+<td>React 19 + Vite + TypeScript; React Router; TanStack Query/Table; Tailwind (v4) + shadcn/ui components; ECharts; <code>&lt;video&gt;</code> + canvas overlays; <code>openapi-typescript</code></td>
+<td>Polished, typed, fast; fewer moving parts than a framework</td>
+<td>Plain CSS instead of Tailwind</td>
+</tr>
+<tr>
+<td>Auth</td>
+<td>Session cookie (HTTP-only) + argon2 password hashes; roles admin / reviewer / viewer</td>
+<td>Simple and sufficient</td>
+<td>Basic auth (demo only)</td>
+</tr>
+<tr>
+<td>Tests</td>
+<td>pytest (+httpx, pytest-cov), Vitest + React Testing Library, Playwright</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Operations</td>
+<td>Two run paths: <strong>native</strong> (uv + portable PostgreSQL on the managed lab PC) and <strong>Docker Compose</strong> (NVIDIA Container Toolkit where allowed); <code>pydantic-settings</code> + <code>.env</code>; structlog JSON logs; a jobs dashboard in the app; <code>/health</code> (P0) and Prometheus <code>/metrics</code> (P1); nightly <code>pg_dump</code> + media copy to a second disk; GitHub Actions CI (CPU, stub adapters)</td>
+<td>Works whether or not IT allows Docker</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="7-dataset-and-model-strategy">7. Dataset and model strategy</h2>
+<h3 id="models-reuse-not-training">Models (reuse, not training)</h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Model / identifier</th>
+<th>How we use it</th>
+<th>License <span class="chip chip-verified" title="Verified">V</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Detector</td>
+<td>MegaDetector <strong>MDv1000-redwood</strong> / MDv5a (<code>pip install megadetector</code>; <code>python -m megadetector.detection.run_detector_batch MDV5A &lt;dir&gt; &lt;out.json&gt; --recursive --output_relative_filenames</code>)</td>
+<td>As-is. Use LILA's precomputed results for experiments.</td>
+<td>MIT repo; weights <span class="chip chip-open" title="Unresolved">U</span></td>
+</tr>
+<tr>
+<td>Species ID</td>
+<td><strong>BioCLIP 2</strong> (<code>open_clip.create_model_and_transforms('hf-hub:imageomics/bioclip-2')</code>)</td>
+<td>Zero-shot with a taxonomic-name prompt per project species, plus <strong>our</strong> per-site heads</td>
+<td>MIT (card)</td>
+</tr>
+<tr>
+<td>Species reference</td>
+<td><strong>SpeciesNet</strong> (<code>pip install speciesnet</code>; <code>python -m speciesnet.scripts.run_model --folders &lt;dir&gt; --predictions_json out.json --country &lt;ISO3&gt;</code>)</td>
+<td>Comparison baseline only; LILA leakage caveat</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td>Video segmentation / tracking</td>
+<td><strong>SAM 3</strong> / <strong>SAM 3.1</strong> (<code>git clone https://github.com/facebookresearch/sam3 &amp;&amp; pip install -e .</code>; <code>hf auth login</code>; <code>build_sam3_video_predictor()</code>)</td>
+<td>As-is with text prompts. Fine-tuning is P2.</td>
+<td>SAM License; gated</td>
+</tr>
+<tr>
+<td>Camouflage (P1)</td>
+<td><strong>DepthSAM</strong> (<code>git clone https://github.com/hjy0518/DepthSAM</code>; weights per README; <code>python test.py</code>)</td>
+<td>Inference only</td>
+<td>Apache code + NC DA-V2-L</td>
+</tr>
+<tr>
+<td>Aerial (P1)</td>
+<td><strong>OWL-C</strong> (CPU-capable) / <strong>OWL-D</strong>; legacy HerdNet (MegaDetector-Overhead; <code>uv sync --no-default-groups --group gpu</code>)</td>
+<td>As-is; tiled inference</td>
+<td>MIT code; CC BY-NC-SA weights</td>
+</tr>
+<tr>
+<td>VLM (P2)</td>
+<td>Qwen3-VL-4B-Instruct, or 8B quantized to 4-bit (8B in bf16 needs ~17 GB, too tight next to other models on 20 GB) <span class="chip chip-assume" title="Assumption">A</span> (transformers ≥4.57)</td>
+<td>Real-Wild-VLM-style prompts</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td>Detector fine-tune fallback (P2)</td>
+<td>RF-DETR N/S/M/L</td>
+<td>Only if the aerial module needs boxes</td>
+<td>Apache-2.0</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Our own work, separate from what we reuse:</strong>
+- the triage policy (calibration, conformal/ACI, selection);
+- per-site adaptation code and Balanced Softmax;
+- sequence/clip aggregation, MaxN counting and quality features;
+- every pipeline, backend, frontend and evaluation harness;
+- StreamTrap-mini construction;
+- all experiments.</p>
+<h3 id="datasets">Datasets</h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Used for</th>
+<th>Access <span class="chip chip-verified" title="Verified">V</span></th>
+<th>License</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SA-FARI test</strong> (833 videos, 1,083 masklets, 62,341 annotations, 83 species, 91 locations)</td>
+<td>Exp 2 + video pipeline QA</td>
+<td>HF gated annotations (<code>sa_fari_test(_ext).json</code>); frames via <code>gcloud storage cp -r gs://cxl-public-camera-trap/sa_fari/test/JPEGImages_6fps &lt;dst&gt;</code> (<span class="chip chip-assume" title="Assumption">A</span> check the exact path)</td>
+<td>CC-BY-NC 4.0</td>
+</tr>
+<tr>
+<td>SA-FARI train</td>
+<td>Qualitative development only. <strong>Never</strong> for SAM 3 evaluation (possible training overlap).</td>
+<td>Same</td>
+<td>CC-BY-NC 4.0</td>
+</tr>
+<tr>
+<td><strong>LILA</strong> camera-trap datasets (Snapshot Serengeti, Caltech CT, Idaho, NACTI, Orinoquía, Island Conservation, …) + LILA precomputed MegaDetector JSON</td>
+<td>Exp 1 StreamTrap-mini (~100–200k crops)</td>
+<td>Public cloud buckets; per-dataset metadata CSV</td>
+<td>Per dataset [A: many CDLA-Permissive; record each]</td>
+</tr>
+<tr>
+<td>COD10K / CAMO / NC4K / CHAMELEON</td>
+<td>Exp 3 reproduction</td>
+<td>Links in the DepthSAM README</td>
+<td>Research use <span class="chip chip-assume" title="Assumption">A</span></td>
+</tr>
+<tr>
+<td>MoCA-Mask (87 videos, 22,939 frames)</td>
+<td>P2 video-camouflage stress test</td>
+<td><a href="https://xueliancheng.github.io/SLT-Net-project" target="_blank" rel="noopener">project page</a></td>
+<td><span class="chip chip-open" title="Unresolved">U</span></td>
+</tr>
+<tr>
+<td>Aerial: LILA Izembek / NOAA seals; Delplanque; WAID</td>
+<td>Exp 4 (P1)</td>
+<td>See §2.3</td>
+<td>NC/unclear: research only</td>
+</tr>
+<tr>
+<td><strong>Team "hard set"</strong> (~300 items: night, blur, camouflage, empty) curated from the above</td>
+<td>Robustness, demo, UI tests</td>
+<td>Ours</td>
+<td>Inherits source licenses</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="preprocessing-and-safeguards">Preprocessing and safeguards</h3>
+<ul>
+<li><strong>Manifests</strong> with SHA-256 for every file.</li>
+<li><strong>Exact-duplicate removal</strong>; perceptual-hash near-duplicates in P1.</li>
+<li><strong>Sequence grouping:</strong> never split a burst across calibration and test.</li>
+<li><strong>Site-disjoint dev/test splits.</strong></li>
+<li><strong>Chronological intervals</strong> within each site; calibration and thresholds use <strong>only past intervals</strong>.</li>
+<li><strong>One final test-set run</strong>, from a tagged commit.</li>
+</ul>
+<p><strong>Training we do:</strong> per-site linear heads or LoRA on BioCLIP 2, temperature scaling, policy thresholds. <strong>Not trained:</strong> detectors, SAM 3, DepthSAM.</p>
+<hr />
+<h2 id="8-eight-week-roadmap">8. Eight-week roadmap</h2>
+<p><strong>Roles:</strong>
+- <strong>A = ML &amp; research lead:</strong> data, models, experiments, report.
+- <strong>B = Product &amp; platform lead:</strong> backend, database, frontend, operations, tests.</p>
+<p><strong>Shared work:</strong> Friday integration and demo; Monday 30-minute planning; a shared GPU calendar, with A's experiments running at night and B's dev work using CPU stub adapters.</p>
+<p><strong>Critical path:</strong>
+1. Access requests (SAM 3, SA-FARI) → W3 video pipeline.
+2. StreamTrap-mini prep → Exp 1 (W3–5) → frozen final test run (W7).
+3. Schema + jobs (W1–2) → review UI (W4) → adaptation loop (W5).</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Week</th>
+<th>Deliverables (acceptance criteria)</th>
+<th>A</th>
+<th>B</th>
+<th>Risks / fallback</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>W1</strong> 19–25 Oct</td>
+<td>Stack boots; access granted; research protocol frozen. <strong>Accept:</strong> the stack starts (native path on the lab PC; Docker on the laptop); uploading 20 images creates DB rows plus stored files; SAM 3 produces masklets on 3 SA-FARI clips; a 2-page protocol lists RQs, splits and metrics.</td>
+<td>Request SAM 3 and SA-FARI access <strong>on day 1</strong>. Read all 3 papers in full (resolve the <span class="chip chip-open" title="Unresolved">U</span> items). Literature check for novelty. Confirm what the lab PC allows (§0). Install CUDA PyTorch with uv. Smoke-test MegaDetector, BioCLIP 2 and SAM 3. Choose LILA sites (criteria in §3). Measure SAM 3 peak VRAM and fps on the 20 GB card. Check the T1000 (sm_75, fp16) runs MegaDetector and BioCLIP 2. Run the molab fallback test (§0 item 6).</td>
+<td>Repo, Compose + native run scripts, schema v1 + Alembic, auth, project/dataset/deployment CRUD, upload + validation + SHA-256 dedup, storage abstraction, CI.</td>
+<td>Access delayed → start with LILA work; SAM 2.1 fallback.</td>
+</tr>
+<tr>
+<td><strong>W2</strong> 26 Oct–1 Nov</td>
+<td><strong>Walking skeleton (images).</strong> <strong>Accept:</strong> upload → async job → detections + species + calibrated scores in DB → visible in the UI grid and viewer. SA-FARI reproduction harness runs on the test set.</td>
+<td>Adapters (MegaDetector, BioCLIP 2) behind protocols. StreamTrap-mini download and crops. Cache embeddings. sam3 <code>veval</code> harness. Reproduce the "animal" prompt and MegaDetector + ByteTrack rows.</td>
+<td>Postgres job queue + workers, with progress over SSE (polling fallback). Prediction persistence. Media browser + image viewer (boxes, top-5).</td>
+<td>Reproduction gap → document the protocol difference; do not tune toward the paper's numbers.</td>
+</tr>
+<tr>
+<td><strong>W3</strong> 2–8 Nov</td>
+<td>Exp 1 baselines + video in the app. <strong>Accept:</strong> table of zero-shot / naive fine-tune / recipe / oracle on dev sites. ECE by interval. One uploaded video shows tracked overlays and MaxN.</td>
+<td>Exp 1 baselines; temperature scaling; split-conformal and ACI. SA-FARI species-prompt runs (overnight, if the lab PC allows unattended runs).</td>
+<td>ffprobe/ffmpeg ingest; SAM 3 video job (chunked, within the VRAM budget); tracks table; clip viewer (server-rendered mask-overlay MP4 + canvas boxes + track timeline).</td>
+<td>SAM 3 too slow → shorter clips, fewer prompts, 3 fps.</td>
+</tr>
+<tr>
+<td><strong>W4</strong> 9–15 Nov</td>
+<td><strong>MVP</strong> (images + video + triage + review + analytics). <strong>Checkpoint:</strong> apply the scope ladder if behind. <strong>Accept:</strong> full loop demo; review decisions audited; Exp 1 selection strategies run on dev sites.</td>
+<td>Selection strategies (random, least-confidence, margin, entropy, k-center, ours); budget loop simulator; package the policy as a <code>model_version</code>.</td>
+<td>Review queue (keyboard, timer, reason codes); triage badges; audit log; analytics v1 (counts, diel).</td>
+<td>Behind → cut aerial and in-app DepthSAM now.</td>
+</tr>
+<tr>
+<td><strong>W5</strong> 16–22 Nov</td>
+<td>Research depth + adaptation loop. <strong>Accept:</strong> ablation table on dev sites. "Adapt site" button creates a new model version and re-triages.</td>
+<td>Ablations (§9). DepthSAM setup + COD10K reproduction (P1). Freeze the Exp 1 protocol before test.</td>
+<td>Adaptation job; models and evaluations pages (risk–coverage, reliability diagrams); CSV/COCO export.</td>
+<td>DepthSAM fails → offline-only or drop.</td>
+</tr>
+<tr>
+<td><strong>W6</strong> 23–29 Nov</td>
+<td>Robustness, efficiency, hardening. <strong>Accept:</strong> robustness and efficiency tables. CI green. A batch of 1,000 images + 50 videos finishes with 0 unhandled errors.</td>
+<td>Day/night and synthetic blur/darkness tests. Cross-dataset policy transfer. Latency/VRAM profiling. Aerial OWL on one dataset (P1). Exp 2 subset analysis.</td>
+<td>Playwright E2E; API/DB tests; load test; error UX; Camtrap DP (P1); security pass (RBAC, upload limits, person blur, coordinate obfuscation).</td>
+<td>Aerial → P2 if not working by Wed.</td>
+</tr>
+<tr>
+<td><strong>W7</strong> 30 Nov–6 Dec</td>
+<td><strong>Feature freeze (Wed 2 Dec).</strong> Final results. <strong>Accept:</strong> final test-set numbers from a tagged commit, with bootstrap CIs. Report draft. Review-effort mini-study done.</td>
+<td>Single final test run. Statistics. Figures. Mini-study: 2–4 reviewers × 200 items, risk-ordered vs random order, measuring time per item and accuracy.</td>
+<td>UI polish; demo seed script; backups; model/dataset cards in the app; README and deployment docs.</td>
+<td>Only bug fixes after the freeze.</td>
+</tr>
+<tr>
+<td><strong>W8</strong> 7–13 Dec</td>
+<td>Report, demo, hand-in. <strong>Accept:</strong> §13 checklist passes; demo rehearsed twice; backup video recorded.</td>
+<td>Technical report (8-page paper style) + reproducibility appendix.</td>
+<td>Demo script; slides; final deployment from a clean clone.</td>
+<td>2 buffer days.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>MVP definition:</strong> the W4 end state.</p>
+<p><strong>Scope ladder</strong> (cut in this order if behind):
+1. aerial module;
+2. in-app DepthSAM;
+3. LoRA (keep linear heads);
+4. Camtrap DP;
+5. SSE (fall back to polling);
+6. Exp 2b.</p>
+<p><strong>Never cut:</strong> Exp 1, SA-FARI reproduction, the review loop, tests, docs.</p>
+<p><strong>Resources:</strong>
+- <strong>Lab PC</strong> (RTX 4000 Ada 20 GB, i7-14700, 32 GB, ~1.7 TB free): heavy GPU work and all raw datasets (≥300 GB, outside OneDrive). Native run path if Docker/WSL2 is not allowed.
+- <strong>Teammate's PC</strong> (Quadro T1000 4 GB, i7 9th gen, 32 GB): light GPU development; MegaDetector/BioCLIP 2 runs; data prep.
+- <strong>Your laptop</strong> (i5-1235U, 20 GB, no CUDA, ~180 GB free, Docker): platform development with stubs; Exp 1 simulations on cached embeddings.
+- <strong>molab account</strong> (free, preview) as a tested fallback for GPU-heavy batch jobs; Colab or Kaggle as a second option.
+- <strong>A shared team drive</strong> for cached embeddings and result files. BioCLIP 2 embeddings for ~200k crops in fp16 come to ~300 MB <span class="chip chip-assume" title="Assumption">A</span>. Manifests, configs and summary results go in git.
+- HF account (gated access for SAM 3 and SA-FARI);
+- <code>gcloud</code> CLI;
+- GitHub (private repo);
+- <strong>cloud cost $0</strong>.</p>
+<hr />
+<h2 id="9-research-and-evaluation-plan">9. Research and evaluation plan</h2>
+<p><strong>Research questions:</strong>
+- <strong>RQ1 (calibration under drift).</strong> Does post-hoc calibration fitted on past intervals stay calibrated on future intervals, per site and for day vs night?
+- <strong>RQ2 (risk control).</strong> Does conformal / ACI auto-acceptance keep realized error ≤ α on future intervals, and at what coverage?
+- <strong>RQ3 (label efficiency).</strong> At a fixed review budget, how close do uncertainty × class-balanced selection plus the StreamTrap recipe get to oracle accuracy?
+- <strong>RQ4 (video counting).</strong> Does SAM 3 beat MegaDetector + ByteTrack at per-clip counts, and on which SA-FARI subsets?</p>
+<p><strong>Hypotheses</strong> (to test, not claims):
+- <strong>H1:</strong> temperature scaling lowers ECE on the next interval compared with uncalibrated scores.
+- <strong>H2:</strong> ACI with day/night groups has fewer α-violations than split-conformal across test sites.
+- <strong>H3:</strong> at a 10% budget, our policy gives higher final-label macro-F1 than random or least-confidence review (paired bootstrap over sites, p &lt; 0.05).
+- <strong>H4:</strong> SAM 3 has lower MaxN error than MegaDetector + ByteTrack, overall and on night clips.</p>
+<p><strong>Baselines:</strong>
+- zero-shot BioCLIP 2 with no review;
+- a raw-softmax threshold;
+- random review, least-confidence, margin, entropy and k-center review at the same budget;
+- naive fine-tuning;
+- StreamTrap's "accumulated with recipe" (all labels; the oracle);
+- SpeciesNet (reference; possible leakage);
+- for video: MegaDetector + ByteTrack / OC-SORT (SA-FARI rows).</p>
+<p><strong>Metrics, chosen per task:</strong></p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Metrics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Classification</td>
+<td>Average per-class accuracy (StreamTrap's metric), macro-F1, per-species F1, confusion matrices</td>
+</tr>
+<tr>
+<td>Calibration / triage</td>
+<td>ECE and adaptive ECE; coverage; realized error among auto-accepted (bootstrap CI); α-violation rate across sites; AURC; human labels used; labels to reach oracle −2 points</td>
+</tr>
+<tr>
+<td>Video</td>
+<td>cgF1, pHOTA, TETA (species prompts); HOTA, IDF1, DetA, AssA ("animal"), via the sam3 <code>veval</code> and TrackEval</td>
+</tr>
+<tr>
+<td>Counting</td>
+<td>MaxN MAE, RMSE and exact-match % per clip</td>
+</tr>
+<tr>
+<td>Camouflage (P1)</td>
+<td>S-α, F-β^w, E-φ, MAE (COD10K); IoU/Dice on SA-FARI small/challenging crops</td>
+</tr>
+<tr>
+<td>Aerial (P1)</td>
+<td>Point precision/recall/F1 within a pixel radius; count MAE/RMSE</td>
+</tr>
+<tr>
+<td>Efficiency</td>
+<td>images/s; s per clip; GPU-ms per stage; peak VRAM (<code>torch.cuda.max_memory_allocated</code>); end-to-end time for 1,000 images</td>
+</tr>
+<tr>
+<td>Human</td>
+<td>s per item; correction rate; agreement between reviewers on 50 shared items</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Ablations (Exp 1):</strong>
+- calibration on/off;
+- split-conformal vs ACI;
+- Mondrian day/night grouping on/off;
+- class-balance quota on/off;
+- Balanced Softmax on/off;
+- linear head vs LoRA;
+- WiSE on/off;
+- budget ∈ {1, 5, 10, 25}%;
+- α ∈ {2, 5, 10}%;
+- sequence aggregation on/off;
+- calibration fraction ∈ {0.2, 0.3, 0.5} and per-site vs pooled calibration;
+- simulated reviewer noise of 0 or 2%.</p>
+<p><strong>Robustness:</strong>
+- day vs night;
+- synthetic blur and darkness on test crops;
+- cross-dataset: policy tuned on dataset X's sites, tested on dataset Y.</p>
+<p><strong>Reproducibility:</strong>
+- configs in git;
+- manifests with hashes;
+- locked environments (<code>uv.lock</code> per image);
+- Docker image digests;
+- seeds (≥3 for anything that trains);
+- every result row in <code>evaluation_runs</code> records the git commit;
+- one frozen test run;
+- negative results reported.</p>
+<p><strong>Leakage safeguards:</strong>
+- SAM 3 is evaluated only on the SA-FARI test set;
+- SpeciesNet on LILA is a non-zero-shot reference;
+- sites are disjoint between dev and test;
+- intervals are chronological;
+- bursts are kept together;
+- there is a written leakage statement in the report.</p>
+<h3 id="application-testing-strategy">Application testing strategy</h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>What is tested</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model adapters</td>
+<td>"Golden" outputs on 5 fixed inputs (within a tolerance); CPU stub adapters for CI</td>
+</tr>
+<tr>
+<td>Metric code</td>
+<td>Unit tests on hand-computed toy cases (ECE, conformal coverage on synthetic streams, MaxN)</td>
+</tr>
+<tr>
+<td>API</td>
+<td>pytest + httpx against Postgres in Docker; authentication and roles; bad, corrupt and oversized uploads</td>
+</tr>
+<tr>
+<td>Database</td>
+<td>Alembic upgrade and downgrade; foreign keys; unique (dataset, sha256)</td>
+</tr>
+<tr>
+<td>Workers</td>
+<td>Idempotent re-runs (no duplicate predictions); failure leaves a <code>failed</code> status with an error</td>
+</tr>
+<tr>
+<td>Frontend</td>
+<td>Vitest + React Testing Library for components</td>
+</tr>
+<tr>
+<td>End to end</td>
+<td>Playwright: login → project → upload → job done → review → export</td>
+</tr>
+<tr>
+<td>Acceptance</td>
+<td>Scripted demo dataset run; 1,000-image / 50-video load test</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="10-uiux-blueprint">10. UI/UX blueprint</h2>
+<p><strong>Navigation.</strong> A left sidebar for each project: Overview · Data · Jobs · Media · Review · Analytics · Models &amp; Evaluation · Exports · Settings. The top bar has a project switcher and the user menu.</p>
+<p><strong>Screens:</strong></p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Screen</th>
+<th>Contents and interactions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Overview</strong></td>
+<td>KPIs (processed, % auto-accepted, review backlog, species verified); recent jobs; alerts (failed items, low-quality share).</td>
+</tr>
+<tr>
+<td><strong>Data</strong></td>
+<td>Deployments table. Drag-and-drop folder/zip upload with a per-file validation list and duplicate warnings. Dataset versions ("freeze snapshot").</td>
+</tr>
+<tr>
+<td><strong>Jobs</strong></td>
+<td>Progress by stage; throughput; errors with retry; cancel.</td>
+</tr>
+<tr>
+<td><strong>Media browser</strong></td>
+<td>Virtualized thumbnail grid. Filters: species, triage status, calibrated-confidence range, day/night, quality flag, deployment, date.</td>
+</tr>
+<tr>
+<td><strong>Clip/Image viewer</strong></td>
+<td>Overlay toggles (boxes, masks, track IDs, labels). Track timeline. MaxN. Side panel: top-5 species with calibrated %, <strong>reason codes</strong> for review (low confidence, night, tiny object, model disagreement, camouflage), and the model versions used. "Refine (DepthSAM)" button (P1).</td>
+</tr>
+<tr>
+<td><strong>Review queue</strong></td>
+<td>Risk-ordered, one item at a time. Keys: <code>1–9</code> pick a top-k label, <code>A</code> accept, <code>E</code> empty, <code>X</code> reject box, <code>U</code> unsure, <code>Z</code> undo, <code>/</code> species search. Burst batch-accept (P1). Session stats (items/hour). Time per item is recorded.</td>
+</tr>
+<tr>
+<td><strong>Analytics</strong></td>
+<td>Species counts (toggle verified-only vs including auto-accepted). Diel activity. Detections per deployment and RAI (P1). Trends. Every chart labels where its data comes from.</td>
+</tr>
+<tr>
+<td><strong>Models &amp; Evaluation</strong></td>
+<td>Versions with license and metrics. Risk–coverage curves, reliability diagrams, confusion matrices, per-species F1. Activate or compare versions. Adaptation history.</td>
+</tr>
+<tr>
+<td><strong>Exports</strong></td>
+<td>CSV, COCO, Camtrap DP (P1), HTML/PDF report (P1).</td>
+</tr>
+<tr>
+<td><strong>Settings</strong></td>
+<td>Users and roles; α target; review budget; coordinate obfuscation; geofence country.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>UX rules:</strong>
+- Confidence is always shown as a <strong>calibrated %</strong> plus a High/Med/Low badge, using colour + icon + text so it works for colour-blind users.
+- "Predicted" vs "Verified" is always visible.
+- Every view has empty, loading and error states.
+- Long jobs never block the UI.
+- Desktop-first (≥1280 px); tablet usable; analytics readable on a phone.</p>
+<p><strong>User journey:</strong>
+1. A field ecologist uploads an SD-card dump.
+2. Duplicates are dropped and files validated.
+3. Live progress shows while it processes.
+4. About X% is auto-accepted at the chosen error target.
+5. A reviewer clears the risk-ordered queue.
+6. They click "Adapt site", and the queue for the next upload shrinks.
+7. They export Camtrap DP or a report.</p>
+<p><strong>Final demo</strong> (~10 minutes):
+1. The full journey above on a mixed demo set (night, camouflage and video clips).
+2. A model-comparison page.
+3. Exp 1 and Exp 2 result slides.
+4. A limitations slide.</p>
+<hr />
+<h2 id="11-repository-and-database-design">11. Repository and database design</h2>
+<div class="scroll"><pre><code>wildtriage/
+  README.md  .env.example  docker-compose.yml  .github/workflows/ci.yml
+  docs/            PROJECT_PLAN.md, adr/, model_cards/, dataset_cards/, report/
+  backend/         pyproject.toml, alembic/ (versions/0001_initial_schema.py), app/{main.py, cli.py, schemas.py,
+                   core/(config, security, logging), db/(base, session), models/(core, data, ml, predictions, review,
+                   evaluation, enums), api/deps.py, api/v1/(auth, projects [+deployments, datasets, uploads], media,
+                   jobs, review, models [+evaluations], analytics), services/(ingest, audit), storage/(base, local),
+                   workers/(queue.py, runner.py, tasks/(ingest, inference))}, tests/
+  ml/              pyproject.toml, models.yaml (license manifest), wildtriage_ml/{adapters/(base, stubs, megadetector,
+                   bioclip, sam3, experimental), pipeline/(quality, sampling, aggregate, counting),
+                   triage/(calibration, conformal, selection, policy), adaptation/(losses, heads, lora),
+                   registry.py, runtime.py}, tests/
+  research/        configs/, data_prep/streamtrap_mini.py, experiments/(exp1_triage [runs], exp2_video_counts,
+                   exp3_camouflage, exp4_aerial), tests/
+  frontend/        package.json, vite.config.ts, src/{App.tsx, api/, components/, hooks/, lib/, pages/}
+  docker/          api.Dockerfile, worker-gpu.Dockerfile, frontend.Dockerfile, nginx.conf
+  scripts/         native/ (setup, start-postgres, start-api, start-worker, start-frontend, backup .ps1),
+                   license_check.py, seed_demo.py
+  third_party/     (pinned clones of sam3, DepthSAM, MegaDetector-Overhead; gitignored)
+</code></pre></div>
+<h3 id="key-entities-postgresql">Key entities (PostgreSQL)</h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Tables</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Users and projects</td>
+<td><code>users</code>; <code>projects</code> (settings JSONB: α, budget, country); <code>taxa</code> (scientific/common name, rank, parent); <code>project_species</code>; <code>deployments</code> (site, camera, start/end, lat/lon (obfuscated), modality)</td>
+</tr>
+<tr>
+<td>Data</td>
+<td><code>datasets</code> (modality, source, license); <code>dataset_versions</code> (manifest URI + sha256, split spec, frozen_at); <code>media_items</code> (kind, storage URI, sha256 unique per dataset, dimensions, duration/fps, captured_at, is_night, quality JSONB, status, error); <code>frames</code> (sampled frames only)</td>
+</tr>
+<tr>
+<td>Models and jobs</td>
+<td><code>model_versions</code> (task, weights URI + sha256, <strong>license</strong>, config, metrics, parent_id, is_active); <code>jobs</code> (also the queue: type, queue, priority, status, attempts/max_attempts, run_after, locked_by, heartbeat_at, progress, counts, params, error, timestamps)</td>
+</tr>
+<tr>
+<td>Predictions</td>
+<td><code>detections</code> (media/frame/track, model_version, job, normalized bbox, mask URI, score, category); <code>tracks</code>; <code>classifications</code> (target, top-k JSONB, taxon, raw and calibrated score)</td>
+</tr>
+<tr>
+<td>Triage and review</td>
+<td><code>triage_decisions</code> (policy version, decision, risk, reasons, features JSONB); <code>review_tasks</code> (priority, status, assignee); <code>verification_decisions</code> (append-only: action, new taxon/bbox, reviewer, time_spent_ms)</td>
+</tr>
+<tr>
+<td>Ground truth, evaluation, audit</td>
+<td><code>annotations</code> (imported ground truth tied to a dataset version); <code>evaluation_runs</code> (model/policy, dataset version, task, config, metrics, artifacts, git commit); <code>exports</code>; <code>audit_log</code> (actor, action, entity, before/after JSONB)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Masks are stored as RLE files in object storage, referenced by URI. Boxes and scores live in the database.</p>
+<h3 id="api-responsibilities-apiv1">API responsibilities (<code>/api/v1</code>)</h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auth</code></td>
+<td>Login, logout, <code>/me</code></td>
+</tr>
+<tr>
+<td><code>projects</code>, <code>deployments</code>, <code>datasets</code></td>
+<td>CRUD</td>
+</tr>
+<tr>
+<td><code>datasets/{id}/uploads</code></td>
+<td>Multipart now; resumable uploads (tus) in P1</td>
+</tr>
+<tr>
+<td><code>datasets/{id}/import</code></td>
+<td>COCO, MegaDetector JSON, SA-FARI</td>
+</tr>
+<tr>
+<td><code>datasets/{id}/versions</code></td>
+<td>Freeze a snapshot</td>
+</tr>
+<tr>
+<td><code>media</code></td>
+<td>Filtered list, detail, signed file URL, predictions</td>
+</tr>
+<tr>
+<td><code>jobs</code></td>
+<td>Create, get, SSE events, cancel</td>
+</tr>
+<tr>
+<td><code>review/queue</code>, <code>review/tasks/{id}/decision</code></td>
+<td>Review queue and decisions</td>
+</tr>
+<tr>
+<td><code>models</code></td>
+<td>List, activate, adapt</td>
+</tr>
+<tr>
+<td><code>evaluations</code></td>
+<td>Evaluation runs</td>
+</tr>
+<tr>
+<td><code>analytics/{project}/{summary\|activity\|events\|rai}</code></td>
+<td>Analytics</td>
+</tr>
+<tr>
+<td><code>exports</code></td>
+<td>Create and fetch exports</td>
+</tr>
+<tr>
+<td><code>health</code>, <code>metrics</code></td>
+<td>Health and metrics</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="12-risk-register-top-risks">12. Risk register (top risks)</h2>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Risk</th>
+<th>Likelihood / Impact</th>
+<th>Mitigation and fallback</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>SAM 3 / SA-FARI gated access delayed</td>
+<td>M / H</td>
+<td>Request on day 1. Meanwhile, LILA work. Fallback: SAM 2.1 (Apache-2.0) with MegaDetector box prompts.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Only one capable GPU (lab PC), shared by 2 people; the T1000 has 4 GB and the laptop has no CUDA</td>
+<td>H / M</td>
+<td>Lab-PC calendar. Heavy jobs batched overnight. Extract embeddings once and cache them, so Exp 1 runs on any CPU. Light GPU work on the T1000. CPU stubs for platform development.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Dependency conflicts (SAM 3 / DepthSAM / MegaDetector)</td>
+<td>H / M</td>
+<td>Separate environments/images and job queues; DepthSAM is P1 and isolated.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Exp 1 shows no gain</td>
+<td>M / H</td>
+<td>Analysis plan registered before the test run. Multiple budgets. Report negative results. The product metric (savings vs labelling everything) still holds.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>StreamTrap code/data unreleased</td>
+<td>H / M</td>
+<td>Rebuild StreamTrap-mini; document differences; don't claim to match their numbers.</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Leakage (SAM 3 ↔ SA-FARI train; SpeciesNet/BioCLIP 2 ↔ LILA)</td>
+<td>H / H</td>
+<td>The safeguards in §9; a leakage statement.</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Licensing (NC data/weights; YOLOv5 AGPL)</td>
+<td>H / M</td>
+<td>License field on every model and dataset; research vs commercial manifests; <code>license_check.py</code>.</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Video overlay complexity in the browser</td>
+<td>M / M</td>
+<td>Server-rendered overlay MP4 for P0; client-side RLE canvas in P1.</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Windows/OneDrive environment</td>
+<td>H / M</td>
+<td>Repo and data outside OneDrive. Native Windows run path (uv + portable Postgres) works without Docker/WSL2.</td>
+</tr>
+<tr>
+<td>10</td>
+<td>2-person bandwidth / exams</td>
+<td>H / H</td>
+<td>Scope ladder; W4 checkpoint; Friday integration; W7 freeze.</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Exposure of endangered-species locations or human privacy</td>
+<td>M / H</td>
+<td>Coordinate obfuscation; person blur; role-based access; audit.</td>
+</tr>
+<tr>
+<td>12</td>
+<td>DepthSAM weights or reproduction issues</td>
+<td>M / L</td>
+<td>Use the Jittor port's reported MAE as a sanity check; move to P2.</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Instructor rejects the P3 swap or ECCV isn't approved</td>
+<td>L–M / M</td>
+<td>Revert to Real-Wild-VLM (re-implement its prompts as the VLM expert); the architecture is unchanged.</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Managed lab PC: no admin rights, no Docker/WSL2, re-imaging, shared GPU, no overnight access</td>
+<td>M–H / H</td>
+<td>Ask IT in W1. Native run path without admin. Keep code in git and data manifests reproducible, so a wiped disk only costs a re-download. Book GPU time.</td>
+</tr>
+<tr>
+<td>15</td>
+<td>20 GB VRAM is not enough for SAM 3 on long or multi-object clips, or for co-resident models (4 GB on the T1000 is not enough for anything heavy)</td>
+<td>M / M</td>
+<td>bf16; chunk clips ≤30 s; VRAM budget with LRU eviction; never load DepthSAM or a VLM next to SAM 3; SAM 3.1 (the faster multi-object tracker) if needed; measure in W1.</td>
+</tr>
+<tr>
+<td>16</td>
+<td>The lab PC becomes unavailable (lab closed, exams, re-imaged)</td>
+<td>M / H</td>
+<td>Everything except SAM 3, DepthSAM and the final demo runs on the T1000 or laptop. Finish SA-FARI runs early (W2–W3) and keep their outputs. Record a backup demo video in W7. <strong>Fallback for GPU-heavy batch jobs: molab</strong> (see "Cloud fallback" below), with Colab or Kaggle as a second option.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="cloud-fallback-for-gpu-heavy-batch-jobs-molab">Cloud fallback for GPU-heavy batch jobs (molab)</h3>
+<p><strong>What was found</strong> [V from marimo's announcement, <a href="https://marimo.io/blog/reintroducing-molab" target="_blank" rel="noopener">blog</a> and <a href="https://marimo.io/blog/newsletter-25" target="_blank" rel="noopener">newsletter 25</a>; one search, not cross-checked against molab's docs]:
+- molab is marimo's cloud notebook service. It is free in public preview and runs on CoreWeave.
+- Default notebook: 4 CPUs, 32 GB RAM. An opt-in GPU is available: an RTX Pro 6000 Blackwell with 96 GB VRAM. marimo says GPUs are free "as long as usage is reasonable" and does not define that.
+- Sessions last at most 12 hours. Notebooks idle for more than 90 minutes are shut down automatically.</p>
+<p><strong>What to run there</strong> <span class="chip chip-rec" title="Recommendation">R</span>:
+- SAM 3 runs on the SA-FARI test set (Exp 2).
+- DepthSAM reproduction (Exp 3).
+- BioCLIP 2 embedding extraction for Exp 1.</p>
+<p><strong>What not to run there</strong> <span class="chip chip-rec" title="Recommendation">R</span>:
+- The app and the live demo (it needs a server that stays up).
+- Anything that cannot be stopped and resumed.</p>
+<p><strong>Rules that make the fallback safe:</strong>
+1. <strong>Chunked, resumable jobs.</strong> Every experiment script writes its results after each chunk (for example per site, per clip batch, or per 500 images) and skips chunks that already exist. A 12-hour limit or an idle shutdown then costs minutes, not days.
+2. <strong>Durable output.</strong> Save embeddings, predictions and metrics somewhere that outlives the session (the team drive or a git-ignored results folder you copy out). [U: does molab keep files between sessions? Test in W1.]
+3. <strong>No secrets in notebooks.</strong> Use the token mechanism molab provides for the Hugging Face token (SAM 3, SA-FARI are gated). Never paste it into a cell or commit it. [U: how molab stores secrets.]
+4. <strong>Pinned environment.</strong> Run <code>uv pip install -e ml</code> plus pinned versions from the repo, so results match the lab PC. Record the molab GPU name and package versions in each <code>evaluation_runs</code> row.
+5. <strong>Same code path.</strong> Notebooks only call <code>research/experiments/*.py</code> and <code>wildtriage_ml</code>, so there is one implementation to test.
+6. <strong>Licenses still apply.</strong> SA-FARI and DepthSAM's depth model are non-commercial: fine for coursework. Do not upload anything the dataset terms forbid redistributing.</p>
+<p><strong>Preview risks:</strong> limits, quotas or pricing can change, "reasonable usage" is undefined, and a shared GPU may be unavailable at peak times. Treat molab as the <em>first</em> fallback and Colab or Kaggle (free tiers with limits) as the second. If neither works, scale down: fewer SA-FARI test clips (a fixed, documented subset) and SAM 3 at 3 fps.</p>
+<p><strong>W1 test (acceptance):</strong> one SA-FARI test clip and ten LILA crops processed end to end in molab, with these numbers written down: peak VRAM, seconds per clip, whether files persist, what happened on idle, and how the HF token was supplied.</p>
+<p><strong>Unresolved <span class="chip chip-open" title="Unresolved">U</span>:</strong>
+- Whether the related-work search missed a paper that already does risk-controlled review for camera traps (repeat properly in W1).
+- Parts of two sources I could not read: the Dussert et al. calibration paper and the conformal acoustic-indices paper (pages blocked).
+- The Real-Wild-VLM and DepthSAM PDFs were not read (DepthSAM: abstract and code README only; Real-Wild-VLM: abstract only).
+- ECCV on the approved venue list, and instructor approval of the swap.
+- Whether the public SAM 3 includes SA-FARI training data.
+- MegaDetector and SpeciesNet weight licenses.
+- The Delplanque dataset license.
+- The exact path of the SA-FARI GCS bucket.
+- What the lab PC allows (admin rights, Docker/WSL2, overnight runs, remote access, disk persistence).</p>
+<hr />
+<h2 id="13-final-acceptance-checklist">13. Final acceptance checklist</h2>
+<p><strong>Product:</strong>
+- [ ] A fresh clone, following the README, reaches the seeded demo in ≤30 minutes on the lab PC (RTX 4000 Ada, 20 GB).
+- [ ] JPG/PNG/MP4/MOV/AVI are ingested. Unsupported or corrupt files are rejected with an error code per file.
+- [ ] A batch of 1,000 images + 50 videos completes with 0 unhandled failures. Per-item errors are recorded.
+- [ ] Every prediction references a <code>model_version</code> and a <code>job</code>. Every review decision has a reviewer, timestamp and before/after values in <code>audit_log</code>.
+- [ ] The review loop works end to end. Analytics can switch between verified-only and predicted data. CSV and COCO exports validate.
+- [ ] CI is green. Core backend and ML modules have ≥70% line coverage. The Playwright happy path passes.</p>
+<p><strong>Research:</strong>
+- [ ] The SA-FARI reproduction table (SAM 3 + MegaDetector + ByteTrack) is reported, with differences in protocol explained.
+- [ ] Exp 1: all baselines plus our method on held-out test sites, with 95% bootstrap CIs. The full ablation table. α-violation analysis. Negative results included.
+- [ ] Calibration (ECE before/after) and day/night robustness are reported.
+- [ ] An efficiency table (latency, throughput, VRAM per stage).
+- [ ] The review-effort mini-study is reported with its caveat (small n).</p>
+<p><strong>Documentation and demo:</strong>
+- [ ] README, architecture, model cards and dataset cards (with licenses), and the technical report (contributions vs reused components, leakage statement, limitations).
+- [ ] The demo is rehearsed twice, and a backup video is recorded.</p>
+<hr />
+<h2 id="14-repository-skeleton-status">14. Repository skeleton status</h2>
+<p>The skeleton in <code>wildtriage/</code> follows §5, §6 and §11. What has been verified so far is recorded in <code>wildtriage/README.md</code> under "Skeleton status". In short:
+- The math in the triage module and the backend's imports and schema are unit-tested.
+- No models, datasets or weights are included or downloaded.</p>
+  </article>
+</div>
+<footer><div>Source: <code>wildtriage/docs/PROJECT_PLAN.md</code> in the project repository.</div></footer>
+
+</body></html>

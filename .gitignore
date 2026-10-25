@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.coverage
+*.egg-info/
+
+# Node
+node_modules/
+frontend/dist/
+
+# Local config and data (never commit secrets or raw data)
+.env
+var/
+
+# Raw datasets and downloads — never commit; back up separately
+data/**
+!data/lila/.gitkeep
+
+# Model weights — never commit
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+
+# Database files
+*.db
+*.sqlite
+
+# Research outputs — raw results gitignored; commit summaries manually
+research/embeddings/**
+research/predictions/**
+research/results/**
+!research/results/exp1_synthetic_2026-10-25.txt
+!research/results/exp1/.gitkeep
+!research/manifests/.gitkeep
+
+# Third-party clones
+third_party/*
+!third_party/README.md
