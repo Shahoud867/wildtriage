@@ -1,0 +1,10 @@
+policy                       model acc final acc coverage acc. err  labels
+zero-shot, no review             0.360     0.358    0.000      nan       0
+random review + recipe           0.376     0.447    0.000      nan    1963
+least-confidence + recipe        0.380     0.475    0.000      nan    1963
+ours (balanced + LTT)            0.379     0.465    0.000      nan    1963
+ours, no day/night split         0.379     0.465    0.000      nan    1963
+ours, alpha=0.10                 0.379     0.465    0.000      nan    1963
+ours (balanced + ACI)            0.379     0.465    0.000      nan    1963
+
+Spec defaults: {'selection': 'balanced_uncertainty', 'acceptance': 'ltt', 'update': 'linear_head_bsm_wise', 'budget': 0.1, 'calib_fraction': 0.3, 'alpha': 0.05, 'delta': 0.1, 'mondrian': True, 'audit_rate': 0.02, 'wise_alpha': 0.5, 'raw_threshold': 0.9, 'seed': 0}

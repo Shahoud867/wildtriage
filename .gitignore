@@ -35,7 +35,16 @@ research/predictions/**
 research/results/**
 !research/results/exp1_synthetic_2026-10-25.txt
 !research/results/exp1/.gitkeep
+!research/results/smoke_*.md
+!research/results/exp3_cod10k.json
+!research/results/exp1_dev_real.txt
 !research/manifests/.gitkeep
+# Smoke-test image caches (downloaded on demand)
+research/smoke/cache/
+research/smoke/sa_fari_cache/
+
+# Papers and reference PDFs (keep out of git)
+*.pdf
 
 # Third-party clones
 third_party/*
