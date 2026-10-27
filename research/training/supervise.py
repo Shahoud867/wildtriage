@@ -20,16 +20,25 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 
 
+def _capture(cmd: list[str]) -> str:
+    try:
+        return subprocess.run(cmd, cwd=HERE, capture_output=True, text=True).stdout.strip()
+    except OSError:
+        return ""
+
+
 def run_info(argv: list[str]) -> dict:
-    import torch
+    # No `import torch` here: this process lives for the whole run, and a CUDA-enabled torch import costs it
+    # ~1.6 GB of Windows commit that the trainer needs.
+    from importlib.metadata import PackageNotFoundError, version
 
     try:
-        commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=HERE, capture_output=True, text=True).stdout.strip()
-    except OSError:
-        commit = ""
-    return {"git_commit": commit or None, "started": time.strftime("%Y-%m-%dT%H:%M:%S"), "argv": argv,
-            "python": sys.version.split()[0], "torch": torch.__version__,
-            "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None}
+        torch_version = version("torch")
+    except PackageNotFoundError:
+        torch_version = None
+    return {"git_commit": _capture(["git", "rev-parse", "HEAD"]) or None, "started": time.strftime("%Y-%m-%dT%H:%M:%S"),
+            "argv": argv, "python": sys.version.split()[0], "torch": torch_version,
+            "gpu": _capture(["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"]) or None}
 
 
 def main() -> None:
