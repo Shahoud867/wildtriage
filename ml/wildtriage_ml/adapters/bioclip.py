@@ -73,6 +73,7 @@ class BioCLIP2Classifier:
 
         emb = torch.from_numpy(self.image_embedding(image_path, box)).to(self._device)
         text = self._text_features(labels).float()
-        scale = self._model.logit_scale.exp().float()
-        logits = (scale * emb @ text.T).cpu().numpy()
+        with torch.no_grad():  # logit_scale is a Parameter, so the product would otherwise require grad
+            scale = self._model.logit_scale.exp().float()
+            logits = (scale * emb @ text.T).cpu().numpy()
         return ClassScores(labels=list(labels), logits=logits)
