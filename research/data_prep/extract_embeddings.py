@@ -142,7 +142,7 @@ def is_valid_npz(path: Path) -> bool:
     try:
         with np.load(path) as z:
             required = ["embeddings", "labels", "interval", "is_night", "text_embeddings", "logit_scale"]
-            return all(k in z and len(z[k]) > 0 for k in required)
+            return all(k in z and np.size(z[k]) > 0 for k in required)  # logit_scale is a 0-d scalar
     except Exception:
         return False
 
@@ -250,6 +250,7 @@ def main():
     parser.add_argument("--images-dir", type=str, default=None, help="Optional directory with local images")
     parser.add_argument("--sites", nargs="*", default=None, help="Optional list of specific sites to process")
     parser.add_argument("--batch-size", type=int, default=16, help="Batch size for BioCLIP 2 encoding")
+    parser.add_argument("--num-workers", type=int, default=4, help="Parallel image downloads per batch")
     parser.add_argument("--device", type=str, default="auto", help="Execution device ('auto', 'cpu', 'cuda', 'mps')")
     parser.add_argument("--limit", type=int, default=None, help="Limit images per site (for smoke testing)")
     parser.add_argument("--mock", action="store_true", help="Use mock extractor for rapid offline verification")
@@ -295,6 +296,7 @@ def main():
             output_dir=output_dir,
             images_dir=Path(args.images_dir) if args.images_dir else None,
             batch_size=args.batch_size,
+            num_workers=args.num_workers,
             limit=args.limit,
             skip_existing=args.skip_existing,
             mock=args.mock,
